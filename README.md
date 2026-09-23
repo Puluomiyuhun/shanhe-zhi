@@ -76,6 +76,7 @@ node verify-expansion.mjs
 node verify-factions.mjs
 node verify-actors.mjs
 node verify-density.mjs
+node verify-order-route.mjs
 ```
 
 覆盖地块拾取、渡桥路线、补给封锁与恢复、城市归属、全部城池可达性。
@@ -97,3 +98,5 @@ Three.js 使用 MIT 许可证，原许可证保留在 [vendor/LICENSE](dist/lab/
 ## 地图鼠标操作
 
 左键查看地块或城市情报；右键地块或城牌立即移动并自动推进，无需再次确认。右键拖动旋转、左键拖动平移，空格暂停／继续。游戏区域屏蔽网页右键菜单。
+
+右键下令后保留金色路线和目标格，随行军更新，抵达或取消清除。空格在普通按钮焦点下同样可切换暂停／推进。

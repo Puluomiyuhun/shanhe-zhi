@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import * as THREE from './dist/lab/vendor/three.module.js';
+import {createWorld,cities} from './dist/lab/world.js';
+import {createOrderRoute} from './dist/lab/order-route.js';
+const root=new THREE.Group(),view=createOrderRoute(root),w=createWorld();
+w.unit.path=w.route(w.unit.cell,w.nearest(cities[1].x,cities[1].z).id).path.slice(1);view.update(w);
+const layer=root.getObjectByName('active-order-route');assert.equal(layer.children.length,3);
+let disposed=0;for(const object of layer.children)object.geometry.addEventListener('dispose',()=>disposed++);
+w.step();view.update(w);assert.equal(disposed,3);assert.equal(layer.children[0].geometry.attributes.position.count,w.unit.path.length+1);
+const targetBefore=[...layer.children[1].geometry.attributes.position.array];view.follow(1,2,3);assert.deepEqual([...layer.children[1].geometry.attributes.position.array],targetBefore);
+while(w.unit.path.length){w.step();view.update(w);}assert.equal(layer.children.length,0);
+w.unit.path=w.route(w.unit.cell,w.origin.id).path.slice(1);view.update(w);assert.equal(layer.children.length,3);view.clear();assert.equal(layer.children.length,0);
+console.log('Route follows remaining steps; target stable; arrival/cancel clear; replaced geometry disposed.');
