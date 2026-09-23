@@ -4,7 +4,7 @@
 <div id="scene"></div><div class="vignette"></div>
 <header>
  <button id="heroInfo" class="hero-portrait" aria-label="沈行舟人物情报"><img src="assets/zhao-yun.png" alt=""><span>沈行舟</span></button>
- <a href="../index.html" class="brand" title="返回山河志原版">山河志</a>
+ <a href="../classic.html" class="brand" title="返回山河志原版">山河志</a>
  <div class="faction"><span class="seal">刘</span><div><small>荆州牧</small><b>刘 表</b></div></div>
  <div class="realm"><span>出征兵力<b>1,200</b></span><span>行军里程<b id="headerSteps">0 <small>格</small></b></span><span class="realm-land">控制土地<b id="headerLand">—</b></span></div>
  <div class="era"><span>初平元年</span><b>荆襄 · 北上新野</b></div>
@@ -41,7 +41,7 @@
 <section class="dispatch" aria-label="军情"><img class="dispatch-portrait" src="assets/zhao-yun.png" alt=""><span>军 情</span><p id="event" role="status">点击「推进」，观察武将出征与周游；我军驻城待命。</p></section>
 <section class="map-key" aria-label="势力图例"><span><i class="green"></i>刘表</span><span><i class="red"></i>袁术</span><small>≈ 汉水</small></section>
 <section class="turn-control" aria-label="行军推进"><div class="phase"><small>天下演进</small><b id="phaseName">待 命</b></div><button id="pause" class="advance" title="空格：推进或暂停">▶ 推进</button><button id="step" title="我军推进一格，AI 推进一刻">推进一刻</button></section>
-<nav class="map-utilities" aria-label="地图设置"><a href="../index.html" class="return-original">原版</a><details class="layer-settings"><summary>图层画质</summary><div class="switches"><button id="grid" aria-pressed="true">六角格 · 自动</button><button id="ownership" aria-pressed="true">势力染色</button><button id="nameplates" aria-pressed="false">名牌 · 自适应</button><button id="quality">画质 · 标准</button></div></details><button id="help">操作说明</button><button id="reset">重置演练</button></nav>
+<nav class="map-utilities" aria-label="地图设置"><a href="../classic.html" class="return-original">原版</a><details class="layer-settings"><summary>图层画质</summary><div class="switches"><button id="grid" aria-pressed="true">六角格 · 自动</button><button id="ownership" aria-pressed="true">势力染色</button><button id="nameplates" aria-pressed="false">名牌 · 自适应</button><button id="quality">画质 · 标准</button></div></details><button id="help">操作说明</button><button id="reset">重置演练</button></nav>
 <div class="map-caption"><strong>荆襄战图</strong><span id="viewMode">地形近览</span><small>九方势力 · 三十五据点</small></div>
 <div id="hover" hidden></div><div id="loading"><span>山 河 志</span><p>正在铺展荆襄山川…</p></div>
 <dialog id="guide"><button id="closeHelp" class="close" aria-label="关闭操作说明">×</button><div class="eyebrow">荆襄战图 · 操作说明</div><h2>远览山河，近察一格</h2><p>滚轮缩放；按住左键拖动平移；按住右键拖动或 Q / E 旋转。左键地块或城市查看情报；右键轻点地块或城牌，立即移动至目标，无需确认；金色路线和目标格会保留至抵达或取消。Esc 清除情报预览。</p><p>「推进／暂停」同时控制我军与 AI；我军没有路线时驻城待命。点击「武将动向」观察六名 AI。周游者独行，出征部队抵近后返军。驻城时只在城市牌显示主角标记。「情报总览」查看势力、城市和部队；「人物指令」查看身份与可用操作。点击城名或部队旗牌，右侧面板切换对应情报，不遮挡地图。滚轮拉远或点击「远览」进入战略染色总览，拉近恢复三维地形。</p><ol><li>右键新野城牌，或点击「前往新野」，立即下令行军。</li><li>部队自动沿可达路线前进；空格快速暂停／继续（点击按钮后也有效），右键新目标可改道。</li><li>抵达新野后，展开「兵站演练」，验证后方封锁与补给恢复。</li></ol><p>河流与险山无法直接通行；断粮行军每格损失 8 点士气。演练不写入旧版行记，刷新或重置即可重新开始。</p><details><summary>样区说明与运行状态</summary><p>11,648 格扩展战区（原样区约 6 倍），包含 35 个据点、9 方势力；城址与归属为概化演练配置，非精确地貌复原。使用原创程序化模型；暂不包含正式战斗、全国 AI 和角色成长。</p><p>临时头像：赵云、袁术立绘取自光荣《三国志14》官网公开武将展示。沈行舟借用赵云外观，不代表赵云本人。图片版权归 KOEI TECMO GAMES 所有。</p><p><a href="https://www.gamecity.ne.jp/sangokushi14/characters.html" target="_blank" rel="noreferrer">查看头像素材来源</a></p><div class="metrics" id="metrics">正在建立沙盘…</div></details></dialog>
