@@ -18,9 +18,9 @@ export function createIntelligence({getWorld,getSimulation,inspectActor,cities,p
   for(const b of dialog.querySelectorAll('[data-view]'))b.setAttribute('aria-pressed',String(b.dataset.view===view));
   let html='';
   if(view==='realm'){
-   html='<p class="intel-lead">荆襄局势 <span>演练配置 · 五方势力</span></p><div class="faction-cards">';
+   html='<p class="intel-lead">荆襄局势 <span>演练配置 · 九方势力</span></p><div class="faction-cards">';
    for(const {id} of factions){const count=w.cells.filter(c=>c.owner===id).length,controlled=cities.filter(c=>c.owner===id);html+=`<section class="intel-card" style="--faction-color:${faction(id).color}"><div class="faction-name"><span class="seal ${id===2?'enemy-seal':''}">${owner(id).slice(0,1)}</span><div><small>${id===1?'所属势力':'其他势力'} · ${faction(id).region}</small><h3>${owner(id)}</h3></div></div><dl class="intel-stats">${datum('控制土地',count+' 格')}${datum('样区城市',controlled.length+' 座')}</dl><div class="land-track"><span style="width:${count/w.cells.length*100}%;background:${faction(id).color}"></span></div><p>${controlled.map(c=>c.name).join(' · ')}</p>${button('cities-'+id,'查看所属城市')}</section>`;}
-   html+='</div><p class="intel-note">五方归属为地图演练配置，非初平元年历史复原。控制土地随占领与封锁变化。城市归属在本轮演练中固定；财政、外交与城池攻防尚未接入。</p>';
+   html+='</div><p class="intel-note">九方归属为地图演练配置，非初平元年历史复原。控制土地随占领与封锁变化。城市归属在本轮演练中固定；财政、外交与城池攻防尚未接入。</p>';
   }else if(view==='cities'){
    const city=cities.find(x=>x.name===cityName)||cities[0],target=w.nearest(city.x,city.z),route=w.route(w.unit.cell,target.id),steps=route?route.path.length-1:null;
    html='<p class="intel-lead">据点一览 <span>选择城市查看情报与行军路线</span></p><div class="city-intel-layout"><div class="city-list">';

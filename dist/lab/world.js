@@ -23,9 +23,9 @@ export function height(x,z){
  // Broad passes connect the expanded valleys; level ground supports each city model.
  const pass=Math.min(Math.abs(z+61+Math.sin(x*.035)*3),Math.abs(z-67+Math.sin(x*.04)*4));
  let valley=pass;
- for(const c of cities){if(c.name==='襄阳'||c.name==='新野'||c.name==='宛城')continue;const end=c.z<22?-61-Math.sin(c.x*.035)*3:67-Math.sin(c.x*.04)*4;const dz=Math.max(Math.min(c.z,end)-z,0,z-Math.max(c.z,end));valley=Math.min(valley,Math.hypot(x-c.x,dz));}
+ for(const c of corridors){const dx=Math.abs(x-c.x);if(dx>=5.5||dx>=valley)continue;const dz=Math.max(c.lo-z,0,z-c.hi);if(dz<5.5)valley=Math.min(valley,Math.hypot(dx,dz));}
  const blend=smooth(1.8,5.5,valley);base=Math.min(base,1.7)+(base-Math.min(base,1.7))*blend;
- for(const c of cities){const d=Math.hypot(x-c.x,z-c.z);if(d<8){const t=smooth(4.7,8,d);base=.5+(base-.5)*t;}}
+ for(const c of cities){const dx=x-c.x,dz=z-c.z;if(Math.abs(dx)>=8||Math.abs(dz)>=8)continue;const d=Math.hypot(dx,dz);if(d<8){const t=smooth(4.7,8,d);base=.5+(base-.5)*t;}}
 
  const width=riverWidth(x);
  return river<width+.08?.04:base*Math.min(1,(river-width-.08)/2.6);
@@ -36,7 +36,11 @@ export const factions=[
  {id:2,name:'袁术',region:'南阳',color:'#df5b46',label:[-5,-56]},
  {id:3,name:'张鲁',region:'汉中',color:'#629be4',label:[-70,-14]},
  {id:4,name:'曹操',region:'颍川',color:'#ab7ddd',label:[58,-49]},
- {id:5,name:'孙坚',region:'江汉',color:'#36b79a',label:[57,43]}
+ {id:5,name:'孙坚',region:'江汉',color:'#36b79a',label:[48,48]},
+ {id:6,name:'马腾',region:'武都',color:'#d18a45',label:[-97,-77]},
+ {id:7,name:'刘焉',region:'巴蜀',color:'#57b6ce',label:[-86,60]},
+ {id:8,name:'董卓',region:'关中',color:'#aeb6c3',label:[-25,-94]},
+ {id:9,name:'刘繇',region:'扬州',color:'#d17caa',label:[94,52]}
 ];
 export const faction=id=>factions.find(f=>f.id===id)||factions[0];
 export const cities=[
@@ -44,8 +48,17 @@ export const cities=[
  {name:'汉中',x:-88,z:-70,owner:3},{name:'西城',x:-60,z:-34,owner:3},{name:'上庸',x:-53,z:0,owner:3},
  {name:'房陵',x:-53,z:49,owner:1},{name:'宜城',x:-5,z:57,owner:1},{name:'江陵',x:-1,z:87,owner:1},
  {name:'鲁阳',x:0,z:-75,owner:2},{name:'许昌',x:57,z:-72,owner:4},{name:'汝南',x:64,z:-28,owner:4},
- {name:'随县',x:50,z:7,owner:5},{name:'安陆',x:60,z:61,owner:5}
+ {name:'随县',x:50,z:7,owner:5},{name:'安陆',x:60,z:61,owner:5},
+ {name:'武都',x:-97,z:-93,owner:6},{name:'阴平',x:-99,z:-43,owner:6},
+ {name:'成都',x:-96,z:87,owner:7},{name:'梓潼',x:-95,z:45,owner:7},{name:'巴西',x:-92,z:-2,owner:7},{name:'江州',x:-63,z:88,owner:7},
+ {name:'长安',x:-48,z:-93,owner:8},{name:'弘农',x:-24,z:-79,owner:8},{name:'洛阳',x:24,z:-93,owner:8},
+ {name:'秣陵',x:97,z:32,owner:9},{name:'丹阳',x:97,z:89,owner:9},{name:'芜湖',x:85,z:65,owner:9},
+ {name:'沔阳',x:-72,z:-62,owner:3},{name:'成固',x:-51,z:-62,owner:3},
+ {name:'堵阳',x:22,z:-48,owner:2},{name:'博望',x:19,z:-16,owner:2},
+ {name:'陈留',x:73,z:-93,owner:4},{name:'陈县',x:94,z:-58,owner:4},{name:'谯县',x:94,z:-14,owner:4},
+ {name:'秭归',x:-37,z:88,owner:1},{name:'江夏',x:48,z:88,owner:5}
 ];
+const corridors=cities.slice(3).map(c=>{const end=c.z<22?-61-Math.sin(c.x*.035)*3:67-Math.sin(c.x*.04)*4;return{x:c.x,lo:Math.min(c.z,end),hi:Math.max(c.z,end)};});
 export function initialOwner(x,z){let best=Infinity,owner=1;const wx=x+Math.sin(z*.09)*2,wz=z+Math.sin(x*.08)*2;for(const c of cities){const d=(wx-c.x)**2+(wz-c.z)**2;if(d<best){best=d;owner=c.owner;}}return owner;}
 export function createWorld(){const cells=[],lookup=new Map();for(let row=0;row<ROWS;row++)for(let col=0;col<COLS;col++){const r=row-Math.floor(ROWS/2),q=col-Math.floor(COLS/2)-Math.floor(r/2),x=DX*(q+r/2),z=DZ*r,y=height(x,z),river=Math.abs(z-riverZ(x))<riverWidth(x)+.53,bridge=river&&Math.abs(x-roadX(22))<1.05;const road=Math.abs(x-roadX(z))<1.7;const terrain=bridge?'渡桥':river?'河流':y>5.3?'险山':y>2.5?'山地':road?'官道':Math.sin(x*.4+z*.2)>.65&&Math.abs(x)>8?'林地':'平原';const c={id:cells.length,q,r,x,z,y,terrain,walkable:!['河流','险山'].includes(terrain),cost:terrain==='官道'?.65:terrain==='山地'?2.4:terrain==='林地'?1.8:1,owner:initialOwner(x,z)};cells.push(c);lookup.set(q+','+r,c);}
 const neighbors=id=>{const c=cells[id];return[[1,0],[0,1],[-1,1],[-1,0],[0,-1],[1,-1]].map(([q,r])=>lookup.get((c.q+q)+','+(c.r+r))).filter(Boolean)};
