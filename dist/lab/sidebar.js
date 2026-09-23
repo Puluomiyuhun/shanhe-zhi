@@ -30,7 +30,7 @@ export function createSidebar({getWorld,getSimulation,cities,onInspect,onPlan,on
   $('cityDescription').textContent=city.name==='襄阳'?'先遣部队从此出发。返回城址的行军仍需沿实际通路执行。':city.name==='新野'?'从襄阳北上需经汉水渡桥；注意维持后方通路。':'可查看地形并预览抵近路线。城池攻防尚未接入。';
   const resident=sim.actors.filter(a=>{const p=sim.position(a);return cityAt(p.x,p.z)?.name===city.name});const current=w.cells[w.unit.cell],hero=cityAt(current.x,current.z)?.name===city.name;
   $('cityResidents').innerHTML='<small>城内人物</small>'+(hero?'<span class="resident-hero">主角 · 沈行舟</span>':'')+resident.map(a=>'<button data-actor="'+a.id+'">'+a.name+' · '+a.phase+'</button>').join('')+(!hero&&!resident.length?'<span>暂无观察对象</span>':'');
-  $('cityRoute').disabled=!route||steps===0||w.unit.morale<=0;$('cityRoute').textContent=steps===0?'已在此地':'预览行军';
+  $('cityRoute').disabled=!route||steps===0||w.unit.morale<=0;$('cityRoute').textContent=steps===0?'已在此地':'移动至此';
  }
  return{showCity(next){city=next;mode='city';refresh();},showUnit(){mode='unit';refresh();},showActor(id){actorId=id;mode='actor';refresh();},refresh,get city(){return city;},get mode(){return mode;}};
 }
