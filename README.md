@@ -74,6 +74,7 @@ verify-*.mjs          地图逻辑验证脚本
 ```sh
 node verify-expansion.mjs
 node verify-factions.mjs
+node verify-actors.mjs
 ```
 
 覆盖地块拾取、渡桥路线、补给封锁与恢复、城市归属、全部城池可达性。
@@ -83,3 +84,7 @@ node verify-factions.mjs
 地形、建筑、植被等使用程序化模型。赵云、袁术头像是用于学习原型的临时素材，来自光荣《三国志14》官网，版权属于 KOEI TECMO GAMES；不属于本项目原创内容，也未授予再分发或商业使用许可。详见 [头像出处](dist/lab/assets/CREDITS.md)。后续正式版本应替换为自有或获授权素材。
 
 Three.js 使用 MIT 许可证，原许可证保留在 [vendor/LICENSE](dist/lab/vendor/LICENSE)。本项目未为原创代码另行指定开源许可证。
+
+## 自主武将演练
+
+点击「推进」可观察六名武将带兵巡防、出征返军或独自周游。在「武将动向」侧栏查看目的地与定位；驻城主角仅在城牌显示「主」。AI 出征目前尚不结算战斗或攻城。验证脚本覆盖五分钟行动循环及旋转投影一致性。

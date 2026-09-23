@@ -1,7 +1,7 @@
 import {factions,faction} from './world.js';
 import {rosterMarkup,rosterRows} from './roster.js';
 // Object-focused information and orders share the live map state.
-export function createIntelligence({getWorld,cities,pause,focusCity,focusUnit,plan,standby}){
+export function createIntelligence({getWorld,getSimulation,inspectActor,cities,pause,focusCity,focusUnit,plan,standby}){
  const dialog=document.getElementById('intelligence'),content=document.getElementById('intelContent');
  const tabs=[['realm','势力'],['cities','城市'],['officer','人物'],['roster','武将'],['unit','部队'],['journal','军情']];
  let view='realm',cityName=cities[0].name,entries=[],selectedOfficer=0;const rosterOptions={faction:"all",sort:-1,descending:true};
@@ -29,7 +29,7 @@ export function createIntelligence({getWorld,cities,pause,focusCity,focusUnit,pl
   }else if(view==='officer'){
    html=`<div class="personal-banner"><div class="dossier-portrait"><img src="assets/zhao-yun.png" alt="赵云立绘暂代沈行舟"></div><div><small>你扮演的武将</small><h3>沈行舟</h3><p>刘表麾下 · 先遣部队指挥</p></div><span class="mode-tag">单武将模式</span></div><dl class="intel-stats four">${datum('可指挥兵力','1,200')}${datum('所在位置',c.terrain+' · '+c.q+','+c.r)}${datum('部队士气',w.unit.morale)}${datum('补给状态',supply?'连通':'中断')}</dl><h4>当前可下达的指令</h4><div class="personal-orders"><button data-action="choose-march"><b>行 军</b><span>在地图选择目的地，预览路线后确认。</span></button><button data-action="standby"><b>原地待命</b><span>停止推进，撤销本队尚未完成的路线。</span></button><button data-action="return" ${w.unit.cell===w.origin.id||w.unit.morale<=0?'disabled':''}><b>返回襄阳</b><span>预览返回出发地的路线，仍需确认军令。</span></button></div><p class="intel-note">当前身份可指挥本队；城市任免、全势力外交不属于本队指令。演练头像暂借赵云立绘。</p><details class="future-roles"><summary>后续角色玩法方向</summary><p>拟接入：交游拜访、修习能力、接受任务、仕官与升迁；获得职位后逐步开放内政与提案。这些玩法尚未接入三维样区。</p></details>`;
   }else if(view==='roster'){
-   html=rosterMarkup(selectedOfficer,rosterOptions);
+   html=rosterMarkup(selectedOfficer,rosterOptions,getSimulation());
   }else if(view==='unit'){
    const destination=w.unit.path.length?w.cells[w.unit.path.at(-1)]:null;
    html=`<div class="personal-banner"><div class="dossier-portrait"><img src="assets/zhao-yun.png" alt=""></div><div><small>先遣部队 · 指挥武将</small><h3>沈行舟</h3><p>${unitState(w)}</p></div></div><dl class="intel-stats four">${datum('兵力','1,200')}${datum('士气',w.unit.morale+' / 100')}${datum('补给',supply?'通路连通':'后方中断')}${datum('累计行军',w.unit.steps+' 格')}</dl><section class="intel-card"><h4>军令详情</h4><p>当前位置：${c.terrain} · ${c.q},${c.r}</p><p>行军目标：${destination?destination.terrain+' · '+destination.q+','+destination.r:'未下达'}</p><p>剩余路程：${w.unit.path.length} 格</p><p class="intel-note">${supply?'通路连通，行军每格恢复 1 点士气，上限 100。':'补给中断，继续行军每格损失 8 点士气。'}</p></section><div class="intel-actions">${button('locate-unit','地图定位')}${button('choose-march','设置行军')}${button('standby','原地待命',!w.unit.path.length)}</div>`;
@@ -50,7 +50,8 @@ export function createIntelligence({getWorld,cities,pause,focusCity,focusUnit,pl
   const cityButton=e.target.closest('[data-city]');if(cityButton){cityName=cityButton.dataset.city;render();return;}
   const action=e.target.closest('[data-action]')?.dataset.action;if(!action)return;
   const city=cities.find(c=>c.name===cityName)||cities[0];
-  if(action.startsWith('cities-')){cityName=cities.find(c=>c.owner===Number(action.split('-')[1])).name;view='cities';render();}
+  if(action.startsWith('watch-')){close();inspectActor(action.slice(6));}
+  else if(action.startsWith('cities-')){cityName=cities.find(c=>c.owner===Number(action.split('-')[1])).name;view='cities';render();}
   else if(action==='locate-city'){close();focusCity(city);}
   else if(action==='plan-city'){close();plan(city);}
   else if(action==='locate-unit'){close();focusUnit();}
