@@ -1,0 +1,11 @@
+# Local-only development files
+.openai/
+.env
+.env.*
+!.env.example
+node_modules/
+__pycache__/
+*.log
+*.tar.gz
+.DS_Store
+Thumbs.db

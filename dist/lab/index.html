@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>山河志 · 荆襄山河</title><link rel="stylesheet" href="lab.css"><link rel="stylesheet" href="battlefield.css"><link rel="stylesheet" href="theme.css"><link rel="stylesheet" href="officers.css"><link rel="stylesheet" href="clarity.css"></head>
+<body>
+<div id="scene"></div><div class="vignette"></div>
+<header>
+ <button id="heroInfo" class="hero-portrait" aria-label="沈行舟人物情报"><img src="assets/zhao-yun.png" alt=""><span>沈行舟</span></button>
+ <a href="../index.html" class="brand" title="返回山河志原版">山河志</a>
+ <div class="faction"><span class="seal">刘</span><div><small>荆州牧</small><b>刘 表</b></div></div>
+ <div class="realm"><span>出征兵力<b>1,200</b></span><span>行军里程<b id="headerSteps">0 <small>格</small></b></span><span class="realm-land">控制土地<b id="headerLand">—</b></span></div>
+ <div class="era"><span>初平元年</span><b>荆襄 · 北上新野</b></div>
+ 
+</header>
+<div class="chapter"><span>荆襄战图</span><b>襄阳 <i>—</i> 新野 <i>—</i> 宛城</b><small>山河演练</small></div>
+<nav class="command-menu" aria-label="主要指令"><button id="info"><b aria-hidden="true">情</b><span>情报总览</span></button><button id="personal"><b aria-hidden="true">人</b><span>人物指令</span></button><button id="citiesInfo"><b aria-hidden="true">城</b><span>城市</span></button><button id="unitsInfo"><b aria-hidden="true">军</b><span>部队</span></button><button id="journal"><b aria-hidden="true">报</b><span>军情簿</span></button></nav>
+<nav class="tools" aria-label="地图镜头"><button id="far"><b aria-hidden="true">舆</b><span>远览</span></button><button id="near"><b aria-hidden="true">察</b><span>近观</span></button><button id="home"><b aria-hidden="true">军</b><span>定位部队</span></button></nav>
+<div id="labels"></div><div id="realmLabels" hidden></div>
+<aside aria-label="对象情报"><nav class="context-tabs" aria-label="侧栏对象"><button id="sideUnit" aria-pressed="true">部队</button><button id="sideCity" aria-pressed="false">城市</button></nav><div id="unitPanel">
+ <div class="panel-heading"><button id="unitInfo" title="查看部队详细情报">部 队 军 令 <small>情报 ›</small></button><em id="orderState">待命</em></div>
+ <div class="officer"><div class="officer-picture"><img src="assets/zhao-yun.png" alt="沈行舟的临时演练头像"></div><div><small>刘表军 · 先遣部队</small><h2><button id="officerInfo" title="查看沈行舟与个人指令">沈行舟 <small>›</small></button></h2><span>出发地 · 襄阳</span></div></div>
+ <div class="stats"><div>兵力<b>1,200</b></div><div>士气<b id="morale">100</b></div><div>补给<b id="supply">连通</b></div></div>
+ <div class="morale-track" title="部队士气"><span id="moraleFill"></span></div>
+ <div class="order"><div class="section-label">行军目标 <span>地形情报</span></div><h3 id="tileName">尚未选择</h3><p id="tileInfo">点击地面，查看地形与预计路线。</p><p id="routeInfo">先试试「前往新野」，观察渡桥路线。</p></div>
+ <button id="march" class="primary" disabled>确认行军</button>
+ <div class="split"><button id="xinye">前往新野</button><button id="cancel">取消路线</button></div>
+ <details class="drill"><summary>兵站演练</summary><p class="note">抵达新野后，可模拟封锁后方通路。</p><button id="block">模拟后方封锁</button></details>
+</div><section id="cityPanel" hidden>
+<div class="panel-heading"><span>城 市 情 报</span><em>据点</em></div>
+<label class="city-select-label" for="citySelect">切换据点</label><select id="citySelect"></select>
+<div class="side-city-title"><span class="city-emblem" aria-hidden="true">城</span><div><small id="cityFaction"></small><h2 id="cityName"></h2></div></div>
+<p id="cityRole" class="city-role"></p><dl class="side-city-stats"><div><dt>距本队</dt><dd id="cityDistance"></dd></div><div><dt>行军成本</dt><dd id="cityCost"></dd></div><div><dt>城址地形</dt><dd id="cityTerrain"></dd></div></dl>
+<div class="order"><div class="section-label">据点概况</div><p id="cityDescription"></p></div>
+<button id="cityRoute" class="primary">预览行军</button><button id="cityLocate" class="city-locate">定位城址</button><p class="side-note">城市归属暂固定；行军预览后仍需确认军令。</p>
+</section></aside>
+<section class="dispatch" aria-label="军情"><img class="dispatch-portrait" src="assets/zhao-yun.png" alt=""><span>军 情</span><p id="event" role="status">等待军令。可先自由缩放和拖动地图。</p></section>
+<section class="map-key" aria-label="势力图例"><span><i class="green"></i>刘表</span><span><i class="red"></i>袁术</span><small>≈ 汉水</small></section>
+<section class="turn-control" aria-label="行军推进"><div class="phase"><small>军令执行</small><b id="phaseName">待 命</b></div><button id="pause" class="advance" title="空格：推进或暂停">▶ 推进</button><button id="step" title="行进一步">行进一步</button></section>
+<nav class="map-utilities" aria-label="地图设置"><a href="../index.html" class="return-original">原版</a><details class="layer-settings"><summary>图层画质</summary><div class="switches"><button id="grid" aria-pressed="true">六角格 · 自动</button><button id="ownership" aria-pressed="true">势力染色</button><button id="quality">画质 · 标准</button></div></details><button id="help">操作说明</button><button id="reset">重置演练</button></nav>
+<div class="map-caption">荆襄战图 <span id="viewMode">地形近览</span></div>
+<div id="hover" hidden></div><div id="loading"><span>山 河 志</span><p>正在铺展荆襄山川…</p></div>
+<dialog id="guide"><button id="closeHelp" class="close" aria-label="关闭操作说明">×</button><div class="eyebrow">荆襄战图 · 操作说明</div><h2>远览山河，近察一格</h2><p>滚轮缩放；按住左键拖动平移；按住右键拖动旋转。点击地面选择地块，右键轻点或 Esc 取消预览。</p><p>「情报总览」查看势力、城市和部队；「人物指令」查看身份与可用操作。点击城名或部队旗牌，右侧面板切换对应情报，不遮挡地图。滚轮拉远或点击「远览」进入战略染色总览，拉近恢复三维地形。</p><ol><li>点击「前往新野」，预览经过渡桥的路线。</li><li>点击「确认行军」，再「推进」或「行进一步」。空格可暂停／推进。</li><li>抵达新野后，展开「兵站演练」，验证后方封锁与补给恢复。</li></ol><p>河流与险山无法直接通行；断粮行军每格损失 8 点士气。演练不写入旧版行记，刷新或重置即可重新开始。</p><details><summary>样区说明与运行状态</summary><p>11,648 格扩展战区（原样区约 6 倍），包含 14 个据点、5 方势力；城址与归属为概化演练配置，非精确地貌复原。使用原创程序化模型；暂不包含正式战斗、全国 AI 和角色成长。</p><p>临时头像：赵云、袁术立绘取自光荣《三国志14》官网公开武将展示。沈行舟借用赵云外观，不代表赵云本人。图片版权归 KOEI TECMO GAMES 所有。</p><p><a href="https://www.gamecity.ne.jp/sangokushi14/characters.html" target="_blank" rel="noreferrer">查看头像素材来源</a></p><div class="metrics" id="metrics">正在建立沙盘…</div></details></dialog>
+<dialog id="intelligence" class="intel-window" aria-labelledby="intelTitle"><div class="intel-header"><div><small>山河志 · 荆襄战图</small><h2 id="intelTitle">情报总览</h2></div><button id="closeIntel" class="close" aria-label="关闭情报">×</button></div><div class="intel-body"><nav id="intelTabs" aria-label="情报分类"></nav><div id="intelContent"></div></div><div class="intel-footer">查阅时行军暂停 · 关闭后可手动继续推进</div></dialog>
+<script type="module" src="main.js"></script></body></html>

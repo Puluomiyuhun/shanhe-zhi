@@ -1,0 +1,55 @@
+import * as THREE from './vendor/three.module.js';
+import {height,roadX} from './world.js';
+
+// Both zoom levels share the same geometry, city positions and ownership buffers.
+export function createOverview({scene,root,terrain,details,ownerMaterial,gridMaterial,light,water}){
+ const mix={value:0};
+ terrain.material.onBeforeCompile=shader=>{
+  shader.uniforms.uOverview=mix;
+  shader.vertexShader='attribute vec3 overviewColor;\nuniform float uOverview;\n'+shader.vertexShader;
+  shader.vertexShader=shader.vertexShader.replace('#include <color_vertex>','#include <color_vertex>\nvColor.xyz = mix(vColor.xyz, overviewColor, uOverview);');
+ };
+ terrain.material.customProgramCacheKey=()=> 'terrain-overview-v1';
+ ownerMaterial.onBeforeCompile=shader=>{
+  shader.uniforms.uOverview=mix;
+  shader.vertexShader='attribute float edgeOpacity;\nvarying float vEdgeOpacity;\n'+shader.vertexShader;
+  shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvEdgeOpacity=edgeOpacity;');
+  shader.fragmentShader='varying float vEdgeOpacity;\nuniform float uOverview;\n'+shader.fragmentShader;
+  shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\ndiffuseColor.a *= mix(1.0,vEdgeOpacity,uOverview);');
+ };
+ ownerMaterial.customProgramCacheKey=()=> 'ownership-overview-v1';
+ // Fine relief contours preserve terrain information after the mountain heights compress.
+ const contours=[];
+ for(let x=-108;x<108;x+=2)for(let z=-101;z<101;z+=2){
+  const corners=[[x,z],[x+2,z],[x+2,z+2],[x,z+2]],h=corners.map(p=>height(...p));
+  for(const level of [4,8,12,16]){const hits=[];for(let i=0;i<4;i++){const j=(i+1)%4;if((h[i]<level)===(h[j]<level))continue;const t=(level-h[i])/(h[j]-h[i]);hits.push([corners[i][0]+(corners[j][0]-corners[i][0])*t,level+.12,corners[i][1]+(corners[j][1]-corners[i][1])*t]);}for(let i=0;i+1<hits.length;i+=2)contours.push(...hits[i],...hits[i+1]);}
+ }
+ const cg=new THREE.BufferGeometry();cg.setAttribute('position',new THREE.Float32BufferAttribute(contours,3));
+ const relief=new THREE.LineSegments(cg,new THREE.LineBasicMaterial({color:'#5b7b75',transparent:true,opacity:0,depthWrite:false,depthTest:false}));relief.renderOrder=5;root.add(relief);
+ const roadPoints=[];for(let z=-97;z<=97;z+=.5){const x=roadX(z);roadPoints.push(new THREE.Vector3(x,height(x,z)+.2,z));}
+ const road=new THREE.Line(new THREE.BufferGeometry().setFromPoints(roadPoints),new THREE.LineDashedMaterial({color:'#7c8b80',dashSize:.6,gapSize:.4,transparent:true,opacity:0,depthWrite:false,depthTest:false}));road.computeLineDistances();road.renderOrder=5;root.add(road);
+ const nearColor=new THREE.Color('#bfc4bb'),farColor=new THREE.Color('#c2c5ba');
+ let previousMode=null;
+ return{
+  amount:0,
+  update(distance,showGrid,showOwner,border){
+   const amount=THREE.MathUtils.smoothstep(distance,160,310);this.amount=amount;mix.value=amount;
+   root.scale.y=THREE.MathUtils.lerp(1,.76,amount);
+   terrain.material.bumpScale=.085*(1-amount);
+   ownerMaterial.opacity=THREE.MathUtils.lerp(.30,.56,amount);
+   relief.material.opacity=amount*.055;road.material.opacity=amount*.55;
+   terrain.material.emissive.set('#b8b5a0');terrain.material.emissiveIntensity=amount*.025;
+   gridMaterial.opacity=showGrid?THREE.MathUtils.clamp((260-distance)/800,.035,.25):0;
+   light.intensity=THREE.MathUtils.lerp(2.5,2.2,amount);light.castShadow=amount<.9;water.material.bumpScale=.035*(1-amount);water.material.metalness=.2*(1-amount);water.material.roughness=.32+.5*amount;
+   scene.background.copy(nearColor).lerp(farColor,amount);scene.fog.color.copy(scene.background);
+   scene.fog.near=THREE.MathUtils.lerp(230,450,amount);scene.fog.far=THREE.MathUtils.lerp(470,850,amount);
+   if(border){border.material.color.set(amount>.6?'#b9a36e':'#eed591');border.material.opacity=.85;border.renderOrder=6;}
+   const strategic=amount>.75;
+   for(const obj of details)obj.visible=!obj.userData.smallDetail||amount<.88;
+   if(previousMode!==strategic){document.body.classList.toggle('strategic-view',strategic);document.getElementById('viewMode').textContent=strategic?'战略总览':'地形近览';previousMode=strategic;}
+   document.getElementById('realmLabels').hidden=!strategic||!showOwner;
+   root.updateMatrixWorld(true);
+   return amount;
+  }
+ };
+}
