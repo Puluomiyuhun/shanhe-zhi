@@ -39,8 +39,8 @@ export const factions=[
   "color": "#acb0bc",
   "ruler": "秦穆公",
   "label": [
-   -68,
-   -18
+   -64,
+   -29
   ]
  },
  {
@@ -149,8 +149,8 @@ export const factions=[
   "color": "#789dae",
   "ruler": "燕桓侯",
   "label": [
-   34,
-   -66
+   36,
+   -67
   ]
  },
  {
@@ -248,8 +248,8 @@ export const factions=[
   "color": "#b29773",
   "ruler": "曾侯与",
   "label": [
-   -17,
-   65
+   -5,
+   39
   ]
  },
  {
@@ -259,8 +259,8 @@ export const factions=[
   "color": "#78906b",
   "ruler": "巴曼子",
   "label": [
-   -48,
-   61
+   -51,
+   59
   ]
  },
  {
@@ -359,14 +359,14 @@ export const cities=[
  },
  {
   "name": "雍",
-  "x": -68,
-  "z": -18,
+  "x": -64,
+  "z": -26,
   "owner": 4
  },
  {
   "name": "汧邑",
-  "x": -75,
-  "z": -37,
+  "x": -74,
+  "z": -39,
   "owner": 4
  },
  {
@@ -503,14 +503,14 @@ export const cities=[
  },
  {
   "name": "曾",
-  "x": -17,
-  "z": 65,
+  "x": -5,
+  "z": 39,
   "owner": 23
  },
  {
   "name": "巴",
-  "x": -48,
-  "z": 61,
+  "x": -51,
+  "z": 59,
   "owner": 24
  },
  {

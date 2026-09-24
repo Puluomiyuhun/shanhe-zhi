@@ -1,5 +1,6 @@
+import {waterAt} from './geography.js';
 import * as THREE from '../lab/vendor/three.module.js';
-import {height,roadX} from './world.js';
+import {height} from './world.js';
 
 // Both zoom levels share the same geometry, city positions and ownership buffers.
 export function createOverview({scene,root,terrain,details,ownerMaterial,gridMaterial,light,water}){
@@ -10,14 +11,18 @@ export function createOverview({scene,root,terrain,details,ownerMaterial,gridMat
   shader.vertexShader=shader.vertexShader.replace('#include <color_vertex>','#include <color_vertex>\nvColor.xyz = mix(vColor.xyz, overviewColor, uOverview);');
  };
  terrain.material.customProgramCacheKey=()=> 'terrain-overview-v1';
+ // Mask ownership in fragment space so coarse hex triangles never paint over narrow rivers.
+ const size=512,mask=new Uint8Array(size*size);
+ for(let z=0;z<size;z++)for(let x=0;x<size;x++){const shore=waterAt(-90+(x+.5)*180/size,-90+(z+.5)*180/size).shore;mask[z*size+x]=Math.round(255*THREE.MathUtils.smoothstep(shore,.15,.9));}
+ const riverMask=new THREE.DataTexture(mask,size,size,THREE.RedFormat);riverMask.minFilter=riverMask.magFilter=THREE.LinearFilter;riverMask.needsUpdate=true;
  ownerMaterial.onBeforeCompile=shader=>{
-  shader.uniforms.uOverview=mix;
-  shader.vertexShader='attribute float edgeOpacity;\nvarying float vEdgeOpacity;\n'+shader.vertexShader;
-  shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvEdgeOpacity=edgeOpacity;');
-  shader.fragmentShader='varying float vEdgeOpacity;\nuniform float uOverview;\n'+shader.fragmentShader;
-  shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\ndiffuseColor.a *= mix(1.0,vEdgeOpacity,uOverview);');
+  shader.uniforms.uOverview=mix;shader.uniforms.uRiverMask={value:riverMask};
+  shader.vertexShader='varying vec2 vMapXZ;\nattribute float edgeOpacity;\nvarying float vEdgeOpacity;\n'+shader.vertexShader;
+  shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvEdgeOpacity=edgeOpacity;vMapXZ=position.xz;');
+  shader.fragmentShader='uniform sampler2D uRiverMask;\nvarying vec2 vMapXZ;\nvarying float vEdgeOpacity;\nuniform float uOverview;\n'+shader.fragmentShader;
+  shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\ndiffuseColor.a *= mix(1.0,vEdgeOpacity,uOverview)*texture2D(uRiverMask,(vMapXZ+90.0)/180.0).r;');
  };
- ownerMaterial.customProgramCacheKey=()=> 'ownership-overview-v1';
+ ownerMaterial.customProgramCacheKey=()=> 'ownership-river-mask-v2';
  // Fine relief contours preserve terrain information after the mountain heights compress.
  const contours=[];
  for(let x=-108;x<108;x+=2)for(let z=-101;z<101;z+=2){
@@ -26,8 +31,6 @@ export function createOverview({scene,root,terrain,details,ownerMaterial,gridMat
  }
  const cg=new THREE.BufferGeometry();cg.setAttribute('position',new THREE.Float32BufferAttribute(contours,3));
  const relief=new THREE.LineSegments(cg,new THREE.LineBasicMaterial({color:'#5b7b75',transparent:true,opacity:0,depthWrite:false,depthTest:false}));relief.renderOrder=5;root.add(relief);
- const roadPoints=[];for(let z=-97;z<=97;z+=.5){const x=roadX(z);roadPoints.push(new THREE.Vector3(x,height(x,z)+.2,z));}
- const road=new THREE.Line(new THREE.BufferGeometry().setFromPoints(roadPoints),new THREE.LineDashedMaterial({color:'#7c8b80',dashSize:.6,gapSize:.4,transparent:true,opacity:0,depthWrite:false,depthTest:false}));road.computeLineDistances();road.renderOrder=5;root.add(road);
  const nearColor=new THREE.Color('#bfc4bb'),farColor=new THREE.Color('#c2c5ba');
  let previousMode=null;
  return{
@@ -37,7 +40,7 @@ export function createOverview({scene,root,terrain,details,ownerMaterial,gridMat
    root.scale.y=THREE.MathUtils.lerp(1,.76,amount);
    terrain.material.bumpScale=.085*(1-amount);
    ownerMaterial.opacity=THREE.MathUtils.lerp(.30,.56,amount);
-   relief.material.opacity=amount*.055;road.material.opacity=amount*.55;
+   relief.material.opacity=amount*.075;
    terrain.material.emissive.set('#b8b5a0');terrain.material.emissiveIntensity=amount*.025;
    gridMaterial.opacity=showGrid?THREE.MathUtils.clamp((260-distance)/800,.035,.25):0;
    light.intensity=THREE.MathUtils.lerp(2.5,2.2,amount);light.shadow.intensity=1-THREE.MathUtils.smoothstep(amount,.72,1);water.material.bumpScale=.035*(1-amount);water.material.metalness=.2*(1-amount);water.material.roughness=.32+.5*amount;

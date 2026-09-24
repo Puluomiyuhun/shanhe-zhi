@@ -14,3 +14,8 @@ header{background:linear-gradient(110deg,#25211bef,#302921e9 82%,#342d2399)}
 .strategic-view .realm-label{font-size:34px;font-weight:800;letter-spacing:4px;color:#fff0ce;border:0;padding:6px 9px;background:none;text-shadow:0 2px 3px #242018,0 0 9px #242018aa}
 .strategic-view .realm-label span{display:none}
 @media(max-width:760px){.strategic-view .realm-label{font-size:28px}}
+
+.geography-label{position:absolute;left:0;top:0;transform:translate(-50%,-50%);pointer-events:none;color:#eee2c4;font:600 13px "Microsoft YaHei",sans-serif;letter-spacing:3px;text-shadow:0 1px 3px #222,0 0 6px #222;white-space:nowrap;z-index:1}
+.geography-label.river{color:#d3ebe4;font-size:13px;font-style:italic}
+.geography-label.关隘{font-size:11px;letter-spacing:1px;color:#f1cf8c;background:#29251ed9;border-top:1px solid #aa8b56;padding:3px 6px}
+.geography-label[hidden]{display:none}
