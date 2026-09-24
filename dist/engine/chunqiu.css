@@ -1,0 +1,23 @@
+/* Separate scenario skin; the original Three Kingdoms page is untouched. */
+header{background:linear-gradient(110deg,#25211bef,#302921e9 82%,#342d2399)}
+.hero-portrait img,.officer-picture img,.dossier-portrait img,.dispatch-portrait,.army-face img{width:100%!important;height:100%!important;max-width:100%!important;left:0!important;top:0!important;transform:none!important;object-fit:contain}
+.dispatch-portrait{height:128px!important;width:98px!important;opacity:.8}
+.map-key{max-width:490px;display:grid;grid-template-columns:repeat(14,auto);gap:6px 10px;padding:9px 11px;opacity:.9}.map-key span{white-space:nowrap;font-size:10px}.map-key i{width:6px;height:6px}
+.realm-label{font-size:23px;letter-spacing:3px}.realm-label span{font-size:9px}
+.scenario-note{color:#cdb88a;font-size:12px}.chapter small{color:#d3bb83}.roster-toolbar strong{color:#e4ca93}
+.officer-face.monogram{background:linear-gradient(140deg,#504332,#25262a);border:1px solid #a68b5c66;color:#e0c793;font-family:"Microsoft YaHei",sans-serif}
+.officer-preview .officer-face.large.monogram{width:84px;height:99px;font-size:37px;border-radius:2px 15px 2px 2px}
+@media(max-width:900px){.map-key{grid-template-columns:repeat(7,auto);max-width:275px}}
+
+/* Strategic overview: country typography replaces city banners, including hover/focus. */
+.strategic-view #labels > .city-label.map-object{display:none!important}
+.strategic-view .realm-label{font-size:34px;font-weight:800;letter-spacing:4px;color:#fff0ce;border:0;padding:6px 9px;background:none;text-shadow:0 2px 3px #242018,0 0 9px #242018aa}
+.strategic-view .realm-label span{display:none}
+@media(max-width:760px){.strategic-view .realm-label{font-size:28px}}
+
+.geography-label{position:absolute;left:0;top:0;transform:translate(-50%,-50%);pointer-events:none;color:#eee2c4;font:600 13px "Microsoft YaHei",sans-serif;letter-spacing:3px;text-shadow:0 1px 3px #222,0 0 6px #222;white-space:nowrap;z-index:1}
+.geography-label.river{color:#d3ebe4;font-size:13px;font-style:italic}
+.geography-label.关隘{font-size:11px;letter-spacing:1px;color:#f1cf8c;background:#29251ed9;border-top:1px solid #aa8b56;padding:3px 6px}
+.geography-label[hidden]{display:none}
+
+.geography-label.lake{color:#d4ede4;font-size:13px;letter-spacing:2px}

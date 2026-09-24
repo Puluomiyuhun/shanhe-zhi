@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import {createWorld,cities,height} from './dist/chunqiu/world.js';
-import {rivers,lakes,waterAt,crossings,passes} from './dist/chunqiu/geography.js';
+import {createWorld,cities,height} from './dist/engine/world.js';
+import {rivers,lakes,waterAt,crossings,passes} from './dist/engine/geography.js';
 const w=createWorld();
 assert.equal(rivers.length,10);
 assert.equal(lakes.length,3);

@@ -1,0 +1,21 @@
+import {format} from './runtime.js';
+import {cityAt} from './actors.js';
+import {faction,cities} from './world.js';
+import {populateOfficers} from './officer-data.js';
+export const officers=populateOfficers();
+export function liveOfficer(o,simulation){return simulation?.actors.find(a=>a.name===o.name);}
+export function officerPlace(o,simulation){const a=liveOfficer(o,simulation);if(!a)return o.place;const p=simulation.position(a);return cityAt(p.x,p.z)?.name||'赴'+a.destination;}
+export function officersInCity(name,simulation){return officers.filter(o=>officerPlace(o,simulation)===name);}
+export function officerFace(o,large=false){return o.portrait?`<span class="officer-face portrait-crop ${large?'large':''}"><img src="${o.portrait}" width="96" height="112" loading="lazy" decoding="async" alt="${o.name}"></span>`:`<span class="officer-face monogram ${large?'large':''}" aria-hidden="true">${o.name[0]}</span>`;}
+export const abilityNames=['统率','武力','智略','政务'];
+export function rosterRows({faction='all',city='all',sort=-1,descending=true}={},simulation=null){
+ const rows=officers.filter(o=>(faction==='all'||o.side===faction)&&(city==='all'||officerPlace(o,simulation)===city));
+ if(sort>=0)rows.sort((a,b)=>(a.stats[sort]-b.stats[sort])*(descending?-1:1)||a.id-b.id);
+ return rows;
+}
+export function rosterMarkup(selected=0,options={},simulation=null){
+ const rows=rosterRows(options,simulation),o=rows.find(x=>x.id===selected)||rows[0];
+ const live=o=>liveOfficer(o,simulation),place=o=>officerPlace(o,simulation),face=officerFace;
+ const th=abilityNames.map((n,i)=>`<th scope="col" aria-sort="${options.sort===i?(options.descending?'descending':'ascending'):'none'}"><button data-roster-sort="${i}" aria-label="按${n}排序">${n}<span aria-hidden="true">${options.sort===i?(options.descending?'▼':'▲'):'↕'}</span></button></th>`).join('');
+ return `${format("<div class=\"roster-toolbar\"><div><strong>列国{officer}</strong><span>")}${rows.length} / ${officers.length} 人</span></div><label>势力 <select id="rosterFaction"><option value="all" ${options.faction==='all'?'selected':''}>全部势力</option>${[...new Set(officers.map(o=>o.side))].map(s=>`<option ${options.faction===s?'selected':''}>${s}</option>`).join('')}</select></label><label>驻城 <select id="rosterCity"><option value="all">全部城池</option>${cities.map(c=>`<option ${options.city===c.name?'selected':''}>${c.name}</option>`).join('')}</select></label></div>${!o?format('<p class="empty-roster">当前条件下暂无驻留{officer}，请切换城池或势力。</p>'):`${format("<div class=\"officer-browser\"><section class=\"officer-ledger\" aria-label=\"{officer}能力列表\"><div class=\"officer-table-scroll\"><table class=\"officer-table\"><thead><tr><th scope=\"col\">{officer}</th><th scope=\"col\">势力</th><th scope=\"col\">所在</th>")}${th}<th scope="col">职责</th></tr></thead><tbody>${rows.map(x=>`<tr data-officer="${x.id}" class="${x.id===o?.id?'is-selected':''}"><th scope="row"><button data-officer="${x.id}" aria-pressed="${x.id===o?.id}" aria-label="预览${x.name}">${face(x)}<span>${x.name}</span></button></th><td><span class="faction-dot" style="background:${x.owner?faction(x.owner).color:'#c9c8bc'}"></span>${x.side.replace('军','')}</td><td>${place(x)}</td>${x.stats.map(v=>`<td class="ability-value ${v>=85?'excellent':''}">${v}</td>`).join('')}<td class="duty-cell">${x.role.split(' · ')[0]}</td></tr>`).join('')}${format("</tbody></table></div><p class=\"ledger-hint\">点击一行预览{officer} · 点击能力列排序</p><p class=\"ledger-note\">能力为本原型暂定值（满值 100），尚未参与战斗结算。角色编组为架空演练。</p></section><section class=\"officer-preview\" aria-label=\"{officer}预览\"><div class=\"preview-identity\">")}${face(o,true)}<div><small>${o.side} · ${place(o)}</small><h3>${o.name}</h3><p>${o.role}</p></div></div><div class="ability-bars">${o.stats.map((v,i)=>`<div><span>${abilityNames[i]}</span><b>${v}</b><i><em style="width:${v}%"></em></i></div>`).join('')}</div><dl class="preview-facts">${live(o)?`<dt>当前动向</dt><dd>${live(o).phase} · ${live(o).destination} <button data-action="watch-${live(o).id}">地图观察</button></dd>`:''}<dt>人物来源</dt><dd>${o.origin} · 跨时代编组</dd><dt>职责</dt><dd>${o.work}</dd><dt>人物交互 · 规划</dt><dd>${o.talk}</dd></dl><details class="preview-more"><summary>自主行动与任务设计</summary><p>${o.ai}</p><p>${o.hook}</p></details><p class="preview-note">拜访与任务尚未接入；驻城名录不自动生成部队。带兵与游历行动可在地图观察。</p></section></div>`}`;
+}

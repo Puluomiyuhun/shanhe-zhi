@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import {createWorld,cities,factions} from './dist/chunqiu/world.js';
-import {createActors,actorDefinitions} from './dist/chunqiu/actors.js';
-import {officers,officersInCity,rosterMarkup} from './dist/chunqiu/roster.js';
+import {createWorld,cities,factions} from './dist/engine/world.js';
+import {createActors,actorDefinitions} from './dist/engine/actors.js';
+import {officers,officersInCity,rosterMarkup} from './dist/engine/roster.js';
 const t=performance.now(),w=createWorld(),sim=createActors(w);
 assert.equal(w.cells.length,6708);assert.equal(factions.length,28);assert.equal(cities.length,38);assert.equal(officers.length,146);
 assert.equal(new Set(officers.map(o=>o.name)).size,officers.length);

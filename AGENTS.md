@@ -11,7 +11,7 @@
 
 ## 重要约定
 
-- 主开发对象是 `dist/lab/` 三维战区；`dist/index.html` 默认进入它，`dist/classic.html` 才是旧二维版。不要把旧地图恢复成默认入口。
+- 多时代主开发对象为 `dist/engine/` + `dist/scenarios/`，入口 `/game/`；详见 [剧本引擎](docs/SCENARIO_ENGINE.md)。`dist/chunqiu/` 旧脚本仅留对照，勿继续修改。原三国 `dist/lab/` 保留；`dist/index.html` 默认进入它，`dist/classic.html` 才是旧二维版。不要把旧地图恢复成默认入口。
 - 这是静态 HTML/CSS/原生 JavaScript + 本地 Three.js 项目。没有 npm 安装或构建的必要；不要仅为了套模板重建框架。
 - 左键查情报，右键直接移动并自动推进；保留路线及目标。空格在普通按钮焦点下也必须能暂停／推进。输入区域和弹窗保留键盘语义。
 - 主角和 AI 连续移动，模拟在到达格心时结算。不要恢复固定 330 ms 动画加独立格子定时器的实现。
