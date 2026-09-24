@@ -81,3 +81,29 @@ export function makeWater(geometry){
  const material=new THREE.MeshStandardMaterial({color:'#587f78',roughness:.32,metalness:.2,bumpMap:map,bumpScale:.035,side:THREE.DoubleSide});
  const mesh=new THREE.Mesh(geometry,material);mesh.receiveShadow=true;return {mesh,animate:time=>{map.offset.x=time*.000012;map.offset.y=time*.000005}};
 }
+
+// Small city satellites use the existing architecture materials and static batching.
+export function makeSettlement(site){
+ const g=new THREE.Group();g.position.set(site.x,site.y+.025,site.z);g.rotation.y=site.angle;
+ const hut=(x,z,w=.65,d=.58)=>building(g,x,z,w,d,.38,0);
+ const post=(x,z,h=.7)=>cube(g,.055,h,.055,x,h/2,z,materials.wood);
+ if(site.kind==='village'){
+  for(const [x,z]of [[-1,-.5],[.05,-.85],[1,.15],[-.6,.85]])hut(x,z);
+  const well=new THREE.Mesh(new THREE.CylinderGeometry(.19,.23,.24,8),materials.wall);well.position.set(.15,.12,.4);g.add(well);
+  for(let i=0;i<7;i++)post(-1.5+i*.45,1.45,.35);cube(g,2.7,.04,.05,-.15,.24,1.45,materials.wood);
+ }else if(site.kind==='market'){
+  for(const x of [-.85,.85])for(const z of [-.7,.7]){for(const dx of [-.32,.32])post(x+dx,z,.68);cube(g,.82,.06,.7,x,.73,z,materials.earth);cube(g,.6,.2,.35,x,.2,z,materials.wood);}
+  hut(0,-1.6,.8,.5);
+ }else if(site.kind==='camp'){
+  hut(-.65,0,.9,.72);hut(.65,.3,.65,.6);
+  for(const x of [-1.4,1.4])for(let z=-1.2;z<=1.2;z+=.35)post(x,z,.65);
+  cube(g,.95,.13,.85,0,1.1,-.9,materials.wood);for(const x of [-.35,.35])post(x,-.9,1.2);roof(g,1.1,1,.3,0,1.45,-.9);
+ }else{
+  hut(-.7,-.55,1.2,.8);hut(.8,.85,.65,.6);
+  for(const x of [.5,1.15]){const furnace=new THREE.Mesh(new THREE.CylinderGeometry(.23,.38,.58,7),materials.earth);furnace.position.set(x,.29,-.55);g.add(furnace);const opening=new THREE.Mesh(new THREE.CircleGeometry(.13,8),materials.dark);opening.rotation.x=-Math.PI/2;opening.position.set(x,.587,-.55);g.add(opening);}
+  for(let i=0;i<4;i++)cube(g,.22,.16,.3,-1+i*.28,.08,.65,materials.wood);
+ }
+ // Irregular packed-earth footpaths, rather than rectangular field tiles.
+ for(const [x,z,w,d]of [[0,.1,.25,2.2],[.1,0,2.5,.2]])cube(g,w,.014,d,x,.012,z,materials.earth);
+ return g;
+}

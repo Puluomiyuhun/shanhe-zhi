@@ -1052,6 +1052,22 @@ export default {
   "cameraExtent": {
    "x": 210,
    "z": 205
+  },
+  "settlementThemes": {
+   "绛": {
+    "kind": "workshop",
+    "name": "晋地铸铜坊",
+    "basis": "考古启发 · 示意选址",
+    "description": "参考侯马晋国都城及铸铜作坊遗存，表现晋地手工业；非侯马遗址的精确位置或原貌。",
+    "source": "https://www.jggdbwg.cn/"
+   },
+   "临淄": {
+    "kind": "workshop",
+    "name": "齐地冶铸坊",
+    "basis": "考古启发 · 示意选址",
+    "description": "参考齐故城冶铸业遗存表现作坊。遗存跨越多个时代，此处建筑与位置为演练概化。",
+    "source": "https://www.cssn.cn/kgxc/kgxc_kghs/202207/t20220728_5430897.shtml"
+   }
   }
  },
  "factions": [

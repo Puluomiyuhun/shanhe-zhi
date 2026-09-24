@@ -16,7 +16,7 @@ export function createOverview({scene,root,terrain,details,ownerMaterial,gridMat
  // Mask ownership in fragment space so coarse hex triangles never paint over narrow rivers.
  const span=Math.max(scenario.map.extent.x,scenario.map.extent.z)+12;
  const size=512,mask=new Uint8Array(size*size);
- for(let z=0;z<size;z++)for(let x=0;x<size;x++){const shore=waterAt(-span+(x+.5)*span*2/size,-span+(z+.5)*span*2/size).shore;mask[z*size+x]=Math.round(255*THREE.MathUtils.smoothstep(shore,.15,.9));}
+ for(let z=0;z<size;z++)for(let x=0;x<size;x++){const shore=waterAt(-span+(x+.5)*span*2/size,-span+(z+.5)*span*2/size).shore;mask[z*size+x]=Math.round(255*THREE.MathUtils.smoothstep(shore,.03,.22));}
  const riverMask=new THREE.DataTexture(mask,size,size,THREE.RedFormat);riverMask.minFilter=riverMask.magFilter=THREE.LinearFilter;riverMask.needsUpdate=true;
  ownerMaterial.onBeforeCompile=shader=>{
   shader.uniforms.uOverview=mix;shader.uniforms.uRiverMask={value:riverMask};shader.uniforms.uMapSpan={value:span};
