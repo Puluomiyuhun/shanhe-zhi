@@ -1,4 +1,4 @@
-import {waterAt} from './geography.js';
+import {waterAt,lakes,lakeBoundary} from './geography.js';
 import * as THREE from '../lab/vendor/three.module.js';
 import {height,cities} from './world.js';
 
@@ -54,17 +54,22 @@ export function makeCity(city){
  return g;
 }
 function mergeGeometry(parts){const positions=[],normals=[],uv=[];for(const {g,matrix} of parts){const a=g.index?g.toNonIndexed():g;a.applyMatrix4(matrix);positions.push(...a.attributes.position.array);normals.push(...a.attributes.normal.array);uv.push(...a.attributes.uv.array);a.dispose();}const result=new THREE.BufferGeometry();result.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));result.setAttribute('normal',new THREE.Float32BufferAttribute(normals,3));result.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));return result;}
-export function addLandscape(scene){
+export function addLandscape(scene,onRoad=()=>false){
  const dummy=new THREE.Object3D(),parts=[];
  for(const [x,y,z,s] of [[0,1.15,0,.49],[-.31,.93,.04,.34],[.3,1.01,.11,.36],[.07,.95,-.3,.35],[.02,1.45,.01,.3]]){const g=new THREE.IcosahedronGeometry(s,0);const p=g.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i),r=1+.13*Math.sin(x*44+y*29)*Math.cos(z*38-x*19);p.setXYZ(i,x*r,y*r,z*r);}g.computeVertexNormals();dummy.position.set(x,y,z);dummy.scale.set(1,1.05,.95);dummy.rotation.set(.1,random()*3,.15);dummy.updateMatrix();parts.push({g,matrix:dummy.matrix.clone()});}
  const crownGeo=mergeGeometry(parts),treePoints=[];
- for(let i=0;i<17000;i++){const x=(random()-.5)*167,z=(random()-.5)*155,y=height(x,z),slope=Math.hypot(height(x+.3,z)-height(x-.3,z),height(x,z+.3)-height(x,z-.3));if(y>11.2||y<.3||slope>1.05||cities.some(c=>Math.hypot(c.x-x,c.z-z)<4.4)||waterAt(x,z).shore<1.08)continue;if(Math.sin(x*.27+z*.16)+Math.cos(z*.28-x*.13)<.5)continue;treePoints.push({x,y,z,s:.48+random()*.65});}
+ for(let i=0;i<17000;i++){const x=(random()-.5)*167,z=(random()-.5)*155,y=height(x,z),slope=Math.hypot(height(x+.3,z)-height(x-.3,z),height(x,z+.3)-height(x,z-.3));if(y>11.2||y<.3||slope>1.05||onRoad(x,z)||cities.some(c=>Math.hypot(c.x-x,c.z-z)<4.4)||waterAt(x,z).shore<1.08)continue;if(Math.sin(x*.27+z*.16)+Math.cos(z*.28-x*.13)<.5)continue;treePoints.push({x,y,z,s:.48+random()*.65});}
  const leafMap=texture('soil');leafMap.repeat.set(3,3);const leaves=new THREE.InstancedMesh(crownGeo,new THREE.MeshStandardMaterial({color:'#c6d1b2',map:leafMap,bumpMap:leafMap,bumpScale:.045,roughness:1}),treePoints.length);
  const trunks=new THREE.InstancedMesh(new THREE.CylinderGeometry(.055,.08,.9,5),materials.wood,treePoints.length);
  treePoints.forEach((t,i)=>{dummy.position.set(t.x,t.y,t.z);dummy.rotation.set(0,random()*6.28,0);dummy.scale.set(t.s,t.s*(.85+random()*.3),t.s);dummy.updateMatrix();leaves.setMatrixAt(i,dummy.matrix);leaves.setColorAt(i,new THREE.Color().setHSL(.205+random()*.08,.22+random()*.13,.22+random()*.12));dummy.position.y=t.y+.42*t.s;dummy.updateMatrix();trunks.setMatrixAt(i,dummy.matrix);});leaves.castShadow=leaves.receiveShadow=true;trunks.castShadow=true;trunks.userData.smallDetail=true;scene.add(leaves,trunks);
  const rockPoints=[];for(let i=0;i<2400;i++){const x=(random()-.5)*163,z=(random()-.5)*153,y=height(x,z);const bank=waterAt(x,z).shore;if((y>3.8&&random()>.48)||(bank>.53&&bank<1.68))rockPoints.push({x,y,z,s:y>3.8?.3+random()*.75:.1+random()*.22});}
  const rocks=new THREE.InstancedMesh(new THREE.DodecahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:'#a19e88',roughness:1,flatShading:true}),rockPoints.length);
  rockPoints.forEach((p,i)=>{dummy.position.set(p.x,p.y+.08,p.z);dummy.rotation.set(random()*.8,random()*6,random()*.6);dummy.scale.set(p.s,p.s*.55,p.s*.7);dummy.updateMatrix();rocks.setMatrixAt(i,dummy.matrix);rocks.setColorAt(i,new THREE.Color().setScalar(.7+random()*.3));});rocks.castShadow=rocks.receiveShadow=true;rocks.userData.smallDetail=true;scene.add(rocks);
+
+ // Sparse reeds on lake margins: instanced geometry, no individual draw calls.
+ const reedPoints=[];for(const lake of lakes)for(let i=0;i<150;i++){const a=random()*Math.PI*2,[bx,bz]=lakeBoundary(lake,a),offset=.7+random()*1.1,x=bx+Math.cos(a)*offset,z=bz+Math.sin(a)*offset;if(waterAt(x,z).shore<.2||onRoad(x,z)||cities.some(c=>Math.hypot(c.x-x,c.z-z)<4))continue;reedPoints.push({x,z});}
+ const blades=[];for(let j=0;j<5;j++){const a=j*2.4,x=Math.cos(a)*.12,z=Math.sin(a)*.12;blades.push(x-.035,0,z,x+.035,0,z,x+.06,.45+random()*.3,z+.08);}
+ const reedGeo=new THREE.BufferGeometry();reedGeo.setAttribute('position',new THREE.Float32BufferAttribute(blades,3));reedGeo.computeVertexNormals();const reeds=new THREE.InstancedMesh(reedGeo,new THREE.MeshStandardMaterial({color:'#8c9861',roughness:1,side:THREE.DoubleSide}),reedPoints.length);reedPoints.forEach((p,i)=>{dummy.position.set(p.x,height(p.x,p.z),p.z);dummy.rotation.set(0,random()*6,0);dummy.scale.setScalar(.9+random()*.5);dummy.updateMatrix();reeds.setMatrixAt(i,dummy.matrix);});reeds.userData.smallDetail=true;scene.add(reeds);
 
 }
 export function makeWater(geometry){
