@@ -8,3 +8,9 @@ header{background:linear-gradient(110deg,#25211bef,#302921e9 82%,#342d2399)}
 .officer-face.monogram{background:linear-gradient(140deg,#504332,#25262a);border:1px solid #a68b5c66;color:#e0c793;font-family:"Microsoft YaHei",sans-serif}
 .officer-preview .officer-face.large.monogram{width:84px;height:99px;font-size:37px;border-radius:2px 15px 2px 2px}
 @media(max-width:900px){.map-key{grid-template-columns:repeat(7,auto);max-width:275px}}
+
+/* Strategic overview: country typography replaces city banners, including hover/focus. */
+.strategic-view #labels > .city-label.map-object{display:none!important}
+.strategic-view .realm-label{font-size:34px;font-weight:800;letter-spacing:4px;color:#fff0ce;border:0;padding:6px 9px;background:none;text-shadow:0 2px 3px #242018,0 0 9px #242018aa}
+.strategic-view .realm-label span{display:none}
+@media(max-width:760px){.strategic-view .realm-label{font-size:28px}}
