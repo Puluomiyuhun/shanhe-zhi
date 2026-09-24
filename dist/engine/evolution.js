@@ -5,7 +5,7 @@ import {waterAt,passes,crossings} from './geography.js';
 export const FACILITY_TYPES={
  farm:{name:'屯田',cost:500,grain:450,turns:5,effect:'每旬粮草 +100',goldBonus:0,grainBonus:100,recruitBonus:0},
  market:{name:'市集',cost:650,grain:350,turns:6,effect:'每旬府库 +65',goldBonus:65,grainBonus:0,recruitBonus:0},
- camp:{name:'军营',cost:600,grain:550,turns:6,effect:'每次征募 +30 · 守城战力 +10%',goldBonus:0,grainBonus:0,recruitBonus:30}
+ camp:{name:'兵站',cost:600,grain:550,turns:6,effect:'集结补粮与休整 · 征募 +30 · 守城 +10%',goldBonus:0,grainBonus:0,recruitBonus:30}
 };
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 export function createEvolution(ctx){
@@ -26,7 +26,7 @@ export function createEvolution(ctx){
   const points=world.cells.filter(c=>c.walkable&&!c.road&&!c.feature&&c.y<2.7&&dist(c,city)>6&&dist(c,city)<12&&cities.every(t=>dist(t,c)>5.5)&&passes.every(p=>dist(p,c)>4)&&crossings.every(p=>dist(p,c)>4)).sort((a,b)=>Math.abs(dist(a,city)-8.5)-Math.abs(dist(b,city)-8.5)||a.id-b.id).filter(c=>flat(c.x,c.z));
   siteCache.set(city.name,points);return points;
  }
- function build(cityName,kind){const city=byName.get(cityName),type=FACILITY_TYPES[kind];if(!city||!type||city.facilities.some(f=>f.kind===kind)||city.facilities.length>=3||city.gold<type.cost||city.grain<type.grain+450||city.garrison<900||active().filter(a=>a.slot===2).length>=8)return null;
+ function build(cityName,kind){const city=byName.get(cityName),type=FACILITY_TYPES[kind];if(!city||!type||kind==='camp'&&now()-(city.lastDepotLoss??-100)<24||city.facilities.some(f=>f.kind===kind)||city.facilities.length>=3||city.gold<type.cost||city.grain<type.grain+450||city.garrison<900||active().filter(a=>a.slot===2).length>=8)return null;
   const a=armies.find(a=>a.owner===city.owner&&a.slot===2&&!a.active);if(!a)return null;
   const site=plots(city).find(c=>c.owner===city.owner&&facilities.every(f=>dist(f,c)>4.5)&&ctx.scenery.every(f=>dist(f,c)>4));if(!site)return null;const route=ctx.route(city.cell,site.id);if(!route)return null;
   // Start at the source city before routing; stale idle positions must not teleport a work crew.
@@ -45,8 +45,8 @@ export function createEvolution(ctx){
  }}
  function plan(state){if(now()<3||now()%2!==state.id%2||active().some(a=>a.owner===state.id&&a.slot===2))return;
   for(const city of owned(state.id).sort((a,b)=>a.facilities.length-b.facilities.length)){
-   if(active().some(a=>a.order==='attack'&&a.destination===city.name&&ctx.atWar(a.owner,city.owner)))continue;
-   const order=city.grain<3500?['farm','market','camp']:city.gold<1400?['market','farm','camp']:['farm','market','camp'];
+   if(active().some(a=>['attack','raid','rally'].includes(a.order)&&a.destination===city.name&&ctx.atWar(a.owner,city.owner)))continue;
+   const border=cities.some(c=>c.owner!==city.owner&&dist(c,city)<35);const order=city.grain<2000?['farm','camp','market']:border?['camp','farm','market']:['farm','market','camp'];
    for(const kind of order)if(!city.facilities.some(f=>f.kind===kind)&&build(city.name,kind))return;
   }
  }
@@ -91,5 +91,6 @@ export function createEvolution(ctx){
   if(now()%12===0&&now()-lastRogue>=72&&random()<.05){const candidates=active().filter(a=>military(a)&&a.troops>=900&&a.food>450&&!['wander','found','return'].includes(a.order));if(candidates.length)wander(candidates[Math.floor(random()*candidates.length)].id);}
  }
  function transferFacilities(city,owner){for(const f of [...city.facilities]){if(f.status==='building')cancel(f);else f.owner=owner;}city.loyalty=45;city.lastPolitics=now();visualRevision++;}
- return{facilities,officerAllegiances,officerHomes,bonus,build,plan,defect,wander,flat,transferFacilities,tick(){construction();wandering();politics();},get visualRevision(){return visualRevision},get seed(){return seed},get newStates(){return newStates},get newCities(){return newCities}};
+ function destroy(f){if(!facilities.includes(f))return;const city=byName.get(f.city);city.facilities.splice(city.facilities.indexOf(f),1);facilities.splice(facilities.indexOf(f),1);f.status='destroyed';f.stock=0;city.lastDepotLoss=now();visualRevision++;}
+ return{destroy,facilities,officerAllegiances,officerHomes,bonus,build,plan,defect,wander,flat,transferFacilities,tick(){construction();wandering();politics();},get visualRevision(){return visualRevision},get seed(){return seed},get newStates(){return newStates},get newCities(){return newCities}};
 }

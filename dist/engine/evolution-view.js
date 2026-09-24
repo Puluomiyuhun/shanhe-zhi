@@ -23,7 +23,7 @@ function facilityModel(f){
   box(.5,.22,.45,f.x+1.3,f.z+1.15,materials.wood);
  }return g;
 }
-export function createEvolutionView({root,getSimulation,cityLabels,regionLabels,label,onCity,onMove,landscape,onChange}){
+export function createEvolutionView({root,getSimulation,cityLabels,regionLabels,label,onCity,onFacility,onMove,landscape,onChange}){
  let current=null,revision=-1,cityLayer=null,facilityLayer=null,facilityLabels=[];
  const initialCityCount=cityLabels.length,initialRealmCount=regionLabels.length;
  function remove(layer){if(!layer)return;root.remove(layer);layer.traverse(o=>o.geometry?.dispose());}
@@ -38,9 +38,9 @@ export function createEvolutionView({root,getSimulation,cityLabels,regionLabels,
   }
   for(const f of c.factions)if(f.showLabel!==false&&!regionLabels.some(r=>r.factionId===f.id)){const el=document.createElement('div');el.className='realm-label';el.style.setProperty('--faction-color',f.color);el.innerHTML=f.name+'<span>新立</span>';document.getElementById('realmLabels').appendChild(el);regionLabels.push({el,factionId:f.id,point:new THREE.Vector3(...[f.label[0],1,f.label[1]])});}
   remove(cityLayer);remove(facilityLayer);cityLayer=batch(c.cities.filter(t=>t.dynamic).map(makeCity));facilityLayer=batch(c.evolution.facilities.map(facilityModel));root.add(cityLayer,facilityLayer);
-  for(const l of facilityLabels)l.el.remove();facilityLabels=c.evolution.facilities.map(f=>{const el=document.createElement('div');el.className='geography-label settlement facility-label';el.style.setProperty('--faction-color',faction(f.owner).color);document.getElementById('labels').appendChild(el);return{f,el,point:new THREE.Vector3(f.x,f.y+1.1,f.z)};});
+  for(const l of facilityLabels)l.el.remove();facilityLabels=c.evolution.facilities.map(f=>{const el=document.createElement(f.kind==='camp'?'button':'div');el.className='geography-label settlement facility-label'+(f.kind==='camp'?' depot-label':'');if(f.kind==='camp'){el.setAttribute('aria-label',f.name+'情报');el.onclick=()=>onFacility(f);el.oncontextmenu=e=>{e.preventDefault();e.stopPropagation();onMove(f);};}el.style.setProperty('--faction-color',faction(f.owner).color);document.getElementById('labels').appendChild(el);return{f,el,point:new THREE.Vector3(f.x,f.y+1.1,f.z)};});
   clearTrees([...c.evolution.facilities,...c.cities.filter(t=>t.dynamic)]);onChange();
  }
- return{sync,update(distance,overview){if(cityLayer)cityLayer.visible=overview<.95;if(facilityLayer)facilityLayer.visible=distance<190;for(const l of facilityLabels){const f=l.f;textContent(l.el,FACILITY_TYPES[f.kind].name+(f.status==='building'?' · '+(f.progress?f.progress+'/'+f.required:'赴工'):''));label(l.el,l.point);if(distance>105)l.el.hidden=true;}}};
+ return{sync,update(distance,overview){if(cityLayer)cityLayer.visible=overview<.95;if(facilityLayer)facilityLayer.visible=distance<190;for(const l of facilityLabels){const f=l.f;textContent(l.el,FACILITY_TYPES[f.kind].name+(f.status==='building'?' · '+(f.progress?f.progress+'/'+f.required:'赴工'):''));if(distance>(f.kind==='camp'?175:105)){if(!l.el.hidden)l.el.hidden=true;}else label(l.el,l.point);}}};
 }
 function textContent(el,value){if(el.textContent!==value)el.textContent=value;}

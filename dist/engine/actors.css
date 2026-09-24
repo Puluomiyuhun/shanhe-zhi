@@ -16,3 +16,13 @@
 .city-label.compact-city:focus-visible{z-index:9;outline:2px solid #f3d498}
 .strategic-view .city-label.compact-city .city-plate{min-width:53px}
 .map-key{flex-wrap:wrap;max-width:440px}
+
+/* Moving map overlays use the property we actually animate. Avoid filtering the live canvas. */
+#labels>button,#labels>.geography-label,#realmLabels>div{will-change:translate;contain:layout style}
+body>aside{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+#labels .city-label.map-object{filter:none}
+#labels .depot-label{pointer-events:auto;cursor:pointer;padding:3px 8px;border:1px solid #c9ab69;background:#27241de8;color:#eedba7;border-radius:3px;font:600 12px system-ui;box-shadow:0 2px 6px #0006}
+#labels .depot-label:hover{border-color:#ffe7a1;background:#463b27}
+#stationOrder{color:#ead39a;border-color:#a98a50}
+#labels .depot-label{z-index:9}
+#labels .depot-label:active:not(:disabled){transform:translate(-50%,-50%)}

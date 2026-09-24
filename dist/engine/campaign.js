@@ -1,3 +1,4 @@
+import {createDepots} from './depots.js';
 import {scenario} from './runtime.js';
 import {cities as initialCities,factions as initialFactions} from './world.js';
 import {createEvolution} from './evolution.js';
@@ -12,7 +13,7 @@ const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 export function createCampaign(world,onEvent=()=>{},options={}){
  let turn=0,elapsed=0,clock=0,cursor=0,revision=0,serial=0;
  const factions=initialFactions.map(f=>({...f,label:[...f.label]})),faction=id=>factions.find(f=>f.id===id);
- let evolution;
+ let evolution,depots;
  const events=[],relations=new Map(),routeCache=new Map();
  const stats={recruited:0,casualties:0,disbanded:0,battles:0,captures:0,sorties:0,alliances:0,peaces:0,routeQueries:0};
  const cities=initialCities.map((c,i)=>({...c,cell:world.nearest(c.x,c.z).id,gold:1500+i%4*180,grain:4800+i%5*250,garrison:2400+i%6*220,development:35+i%5*4,order:80,walls:75,project:'休养',lastCapture:-100}));
@@ -51,19 +52,20 @@ export function createCampaign(world,onEvent=()=>{},options={}){
   relations.set(pair(a,b),{a,b,status:'alliance',since:turn,until:turn+48});stats.alliances++;emit('alliance',faction(a).name+'与'+faction(b).name+'结盟，约定互不侵犯、遇敌援助（48旬）。');return true;
  }
  function makePeace(a,b,reason='久战休兵'){if(!atWar(a,b))return false;relations.set(pair(a,b),{a,b,status:'truce',since:turn,until:turn+18});stats.peaces++;emit('peace',faction(a).name+'与'+faction(b).name+'停战18旬：'+reason+'。');for(const army of active())if((army.owner===a&&byName.get(army.destination)?.owner===b)||(army.owner===b&&byName.get(army.destination)?.owner===a)||army.targetArmy&&((army.owner===a&&armies.find(t=>t.id===army.targetArmy)?.owner===b)||(army.owner===b&&armies.find(t=>t.id===army.targetArmy)?.owner===a)))returnArmy(army,'停战收兵');return true;}
- function dispatch(owner,fromName,targetName,order='attack',targetArmy=null){
+ function dispatch(owner,fromName,targetName,order='attack',targetArmy=null,targetFacility=null){
   const from=byName.get(fromName),target=byName.get(targetName);
   if(!from||!target||from.owner!==owner||active().filter(a=>a.slot!==2).length>=18)return null;
-  if(order==='attack'&&!atWar(owner,target.owner))return null;
+  if(['attack','raid'].includes(order)&&!atWar(owner,target.owner))return null;
   if(targetArmy&&!atWar(owner,targetArmy.owner))return null;
-  const slot=armies.find(a=>a.owner===owner&&!a.active&&a.slot===(order==='attack'?0:1));
-  const troops=Math.floor(from.garrison*(order==='attack'?.65:.52));
+  const slot=armies.find(a=>a.owner===owner&&!a.active&&a.slot===(order==='defend'?1:0));
+  const troops=Math.floor(from.garrison*(order==='defend'?.52:.65));
   if(!slot||troops<650||from.gold<250||from.grain<1000)return null;
-  const destination=targetArmy?.cell??target.cell,r=route(from.cell,destination);if(!r)return null;
+  if(order==='raid'&&(!depots.operational(targetFacility)||targetFacility.owner!==target.owner))return null;
+  const destination=targetFacility?.cell??targetArmy?.cell??target.cell,r=route(from.cell,destination);if(!r)return null;
   if((evolution.officerAllegiances.has(slot.name)&&evolution.officerAllegiances.get(slot.name)!==owner)||active().some(a=>a.name===slot.name))slot.name=faction(owner).name+(slot.slot===0?'前军':'援军');
   from.garrison-=troops;from.gold-=250;const food=Math.min(from.grain*.45,troops*1.5);from.grain-=food;
-  Object.assign(slot,{active:true,cell:from.cell,path:r.path.slice(1),progress:0,troops,initialTroops:troops,food,morale:100,order,targetArmy:targetArmy?.id||null,targetSerial:targetArmy?.serial||0,home:from.name,destination:target.name,phase:order==='attack'?'出征':'迎战',reason:order==='attack'?'奉命攻取'+target.name:'出兵拦截来犯部队，保护'+target.name,serial:++serial,trips:slot.trips+1});
-  countries.get(owner).lastSortie=turn;stats.sorties++;emit('sortie',faction(owner).name+'军 '+slot.name+'率'+troops+'兵自'+from.name+(order==='attack'?'出征':'出城迎战，驰援')+target.name+'。');return slot;
+  Object.assign(slot,{active:true,cell:from.cell,path:r.path.slice(1),progress:0,troops,initialTroops:troops,food,morale:100,order,depot:null,targetFacility:targetFacility?.id||null,lastDepot:-100,targetArmy:targetArmy?.id||null,targetSerial:targetArmy?.serial||0,home:from.name,destination:target.name,phase:order==='attack'?'出征':'迎战',reason:order==='attack'?'奉命攻取'+target.name:'出兵拦截来犯部队，保护'+target.name,serial:++serial,trips:slot.trips+1});
+  if(order==='attack')depots.stage(slot,from,target);if(order==='raid'){slot.phase='袭兵站';slot.reason='优先摧毁威胁边境的'+targetFacility.name;stats.depotRaids++;}countries.get(owner).lastSortie=turn;stats.sorties++;emit('sortie',faction(owner).name+'军 '+slot.name+'率'+troops+'兵自'+from.name+(order==='attack'?'出征':order==='raid'?'出兵袭击':'出城迎战，驰援')+(targetFacility?.name||target.name)+'。');return slot;
  }
  function transfer(city,owner){
   const old=city.owner;city.owner=owner;city.lastCapture=turn;
@@ -81,7 +83,7 @@ export function createCampaign(world,onEvent=()=>{},options={}){
   c.gold=Math.min(30000,c.gold+75+c.development*1.4+bonus.gold);
   c.grain=Math.min(60000,Math.max(0,c.grain+160+c.development*3+bonus.grain-c.garrison*.022));
   c.order=Math.min(100,c.order+(underSiege?0:1));
-  const state=countries.get(c.owner),danger=active().some(a=>a.order==='attack'&&a.destination===c.name&&atWar(a.owner,c.owner));
+  const state=countries.get(c.owner),danger=active().some(a=>['attack','raid','rally'].includes(a.order)&&a.destination===c.name&&atWar(a.owner,c.owner));
   if(c.grain<1300){c.project='屯田';c.grain+=250;}
   else if(c.walls<80&&c.gold>=140){c.project='修筑';c.gold-=140;c.walls=Math.min(100,c.walls+5);}
   else if(c.garrison<(danger?4300:3200+c.development*18)&&c.gold>=110&&c.grain>=250&&!underSiege){const n=Math.min(115+bonus.recruit,Math.floor(c.grain/3));c.project='征募';c.gold-=110;c.grain-=n*2;c.garrison+=n;stats.recruited+=n;}
@@ -90,14 +92,15 @@ export function createCampaign(world,onEvent=()=>{},options={}){
   state.policy=danger?'守土御敌':c.project==='征募'?'练兵备战':c.project==='兴商'?'富国兴商':'休养生息';
  }}
  function decide(state){const homes=owned(state.id);if(!homes.length)return;
-  const hostile=active().filter(a=>atWar(state.id,a.owner)&&a.order==='attack'&&homes.some(c=>c.name===a.destination));
+  const hostile=active().filter(a=>atWar(state.id,a.owner)&&['attack','raid','rally'].includes(a.order)&&homes.some(c=>c.name===a.destination));
   if(hostile.length){const enemy=hostile[0],city=byName.get(enemy.destination);const from=homes.filter(c=>c.garrison>1250).sort((a,b)=>distance(a,position(enemy))-distance(b,position(enemy)))[0];if(from)dispatch(state.id,from.name,city.name,'defend',enemy);}
   if(!hostile.length)evolution.plan(state);
   // Allies can join a defensive war and send an actual field army. No recursive alliance cascade.
   if(!hostile.length&&!armies.some(a=>a.owner===state.id&&a.active&&a.slot===1)){
-   const threatened=active().find(a=>a.order==='attack'&&relation(state.id,byName.get(a.destination)?.owner).status==='alliance'&&relation(state.id,a.owner).status==='peace');
+   const threatened=active().find(a=>['attack','raid','rally'].includes(a.order)&&relation(state.id,byName.get(a.destination)?.owner).status==='alliance'&&relation(state.id,a.owner).status==='peace');
    if(threatened){declareWar(state.id,threatened.owner,'履行盟约援助'+byName.get(threatened.destination).name);dispatch(state.id,homes[0].name,threatened.destination,'defend',threatened);return;}
   }
+  if(!hostile.length&&turn-state.lastSortie>=12){const depot=depots.threat(state.id),source=homes.filter(c=>c.garrison>=2000).sort((a,b)=>depot?distance(a,depot)-distance(b,depot):0)[0];if(depot&&source&&dispatch(state.id,source.name,depot.city,'raid',null,depot))return;}
   const neighbors=cities.filter(c=>c.owner!==state.id).map(c=>({city:c,d:Math.min(...homes.map(h=>distance(h,c)))})).sort((a,b)=>a.d-b.d).slice(0,6);
   if(!neighbors.length)return;
   if(turn>=4&&((state.id+turn)%5===0||hostile.length)){
@@ -115,7 +118,8 @@ export function createCampaign(world,onEvent=()=>{},options={}){
  }
  function logistics(){for(const a of active()){
   a.food=Math.max(0,a.food-a.troops*.035);if(!a.food)a.morale=Math.max(0,a.morale-12);
-  if(!['return','wander','found'].includes(a.order)&&(a.morale<35||a.troops<a.initialTroops*.28))returnArmy(a,a.food?'兵力损耗，保存余部':'随军粮草不足');
+  if(!['return','wander','found','rest','rally'].includes(a.order)&&(a.morale<55||a.food<a.troops*.15)){if(depots.rest(a))continue;}
+  if(!['return','wander','found','rest','rally'].includes(a.order)&&(a.morale<35||a.troops<a.initialTroops*.28))returnArmy(a,a.food?'兵力损耗，保存余部':'随军粮草不足');
   if(a.order==='attack'){const c=byName.get(a.destination);if(!atWar(a.owner,c.owner))returnArmy(a,'目标已非敌城');}
   if(a.order==='defend'){
    const enemy=armies.find(b=>b.id===a.targetArmy&&b.serial===a.targetSerial&&b.active);
@@ -146,7 +150,7 @@ export function createCampaign(world,onEvent=()=>{},options={}){
   if(r.until&&turn>=r.until){const previous=r.status;r.status='peace';r.until=0;emit('diplomacy',faction(r.a).name+'与'+faction(r.b).name+(previous==='alliance'?'盟约期满。':'停战期结束。'));}
   if(r.status==='war'&&turn-r.since>=36)makePeace(r.a,r.b,'久战疲敝，恢复生产');
  }}
- function tick(){turn++;domestic();diplomacy();logistics();battle();evolution.tick();
+ function tick(){turn++;domestic();diplomacy();logistics();battle();evolution.tick();depots.tick();
   if(options.decisions!==false)for(let i=0;i<4;i++){decide(states[cursor%states.length]);cursor++;}
   if(turn%6===0){const c=cities[(turn/6-1)%cities.length];emit('domestic',c.name+'正在'+c.project+'，府库'+Math.floor(c.gold)+'、粮草'+Math.floor(c.grain)+'、守军'+c.garrison+'。');}
  }
@@ -164,5 +168,6 @@ export function createCampaign(world,onEvent=()=>{},options={}){
  }}
  const scenery=createInitialScenery(world);
  evolution=createEvolution({world,cities,factions,states,armies,byName,countries,provinces,owned,active,position,go,route,returnArmy,emit,stats,transfer,makeSlots,bump:()=>revision++,turn:()=>turn,options,atWar,scenery,relations,declareWar,dismiss});
- return{factions,faction,evolution,scenery,cities,states,armies,relations,events,stats,initialTroops,advance,position,relation,atWar,declareWar,makeAlliance,makePeace,dispatch,owned,power,get turn(){return turn},get time(){return clock},get revision(){return revision}};
+ depots=createDepots({world,evolution,cities,armies,atWar,position,go,route,returnArmy,emit,stats,turn:()=>turn});
+ return{depots,factions,faction,evolution,scenery,cities,states,armies,relations,events,stats,initialTroops,advance,position,relation,atWar,declareWar,makeAlliance,makePeace,dispatch,owned,power,get turn(){return turn},get time(){return clock},get revision(){return revision}};
 }
