@@ -4,11 +4,11 @@ import {cities} from './world.js';
 // Scenario actors: finite forces, no spawning, no battle resolution or automatic conquest.
 export const actorDefinitions=scenario.actors;
 export function cityAt(x,z){return cities.find(c=>Math.hypot(c.x-x,c.z-z)<2.8)||null;}
-export function createActors(world,onEvent=()=>{}){
+export function createActors(world,onEvent=()=>{},options={}){
  let time=0;
  const cityByName=name=>cities.find(c=>c.name===name);
  const cellAt=name=>{const c=cityByName(name);return world.nearest(c.x,c.z).id;};
- const actors=actorDefinitions.map((d,i)=>({...d,cell:cellAt(d.home),path:[],progress:0,wait:1000+i*550,phase:d.kind==='army'?'整备':'访友',destination:d.home,returning:false,visits:{[d.home]:1},trips:0,steps:0,cycle:0,reason:d.reason}));
+ const actors=actorDefinitions.filter(d=>!options.travelersOnly||d.kind==='traveler').map((d,i)=>({...d,cell:cellAt(d.home),path:[],progress:0,wait:1000+i*550,phase:d.kind==='army'?'整备':'访友',destination:d.home,returning:false,visits:{[d.home]:1},trips:0,steps:0,cycle:0,reason:d.reason}));
  function plan(a){
   let target;
   if(a.mission==='expedition')target=a.returning?a.home:a.targets[0];

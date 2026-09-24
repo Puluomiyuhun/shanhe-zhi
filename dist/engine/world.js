@@ -33,9 +33,9 @@ function route(from,to){if(!cells[to]?.walkable)return null;const g=new Float64A
 const roads=[];for(const link of roadLinks){const a=cities.find(c=>c.name===link.from),b=cities.find(c=>c.name===link.to),r=route(nearest(a.x,a.z).id,nearest(b.x,b.z).id);if(!r)throw new Error('Unreachable road: '+link.name);roads.push({...link,path:r.path});}
 for(const road of roads)for(const id of road.path){const c=cells[id];if(['河流','湖泊','津渡','险山','关隘','湿地'].includes(c.terrain))continue;c.road=road.name;c.feature=road.name;c.cost=Math.min(c.cost,c.terrain==='山地'?1.6:.75);if(c.terrain!=='山地')c.terrain='官道';}
 function supplied(){const seen=new Set([origin.id]),queue=[origin.id];if(origin.owner!==scenario.player.owner)return false;for(let i=0;i<queue.length;i++){if(queue[i]===unit.cell)return true;for(const n of neighbors(queue[i]))if(n.walkable&&n.owner===scenario.player.owner&&!seen.has(n.id)){seen.add(n.id);queue.push(n.id)}}return false;}
-let blocked=false;const band=cells.filter(c=>c.walkable&&c.z>scenario.map.blockade[0]&&c.z<scenario.map.blockade[1]).map(c=>({id:c.id,owner:c.owner}));function blockade(){blocked=!blocked;for(const b of band)cells[b.id].owner=blocked?(factions.find(f=>f.id!==scenario.player.owner)?.id??b.owner):b.owner;return blocked;}
-function step(){if(!unit.path.length)return false;const next=unit.path.shift();unit.cell=next;cells[next].owner=scenario.player.owner;unit.steps++;unit.morale=Math.max(0,Math.min(100,unit.morale+(supplied()?1:-8)));return true;}
-return{cells,roads,neighbors,nearest,route,supplied,blockade,step,unit,origin,get blocked(){return blocked}};
+let blocked=false;const band=cells.filter(c=>c.walkable&&c.z>scenario.map.blockade[0]&&c.z<scenario.map.blockade[1]).map(c=>({id:c.id,owner:c.owner}));function blockade(){blocked=!blocked;for(const b of band)if(!world.cities?.some(c=>c.cell===b.id))cells[b.id].owner=blocked?(factions.find(f=>f.id!==scenario.player.owner)?.id??b.owner):b.owner;return blocked;}
+function step(){if(!unit.path.length)return false;const next=unit.path.shift();unit.cell=next;if(!world.cities?.some(c=>c.cell===next&&c.owner!==scenario.player.owner))cells[next].owner=scenario.player.owner;unit.steps++;unit.morale=Math.max(0,Math.min(100,unit.morale+(supplied()?1:-8)));return true;}
+const world={cells,roads,neighbors,nearest,route,supplied,blockade,step,unit,origin,get blocked(){return blocked}};return world;
 }
 
 

@@ -78,3 +78,7 @@
 - 概念边界：[王震中《夷夏互化融合说》](https://www.cssn.cn/dkzgxp/zgxp_zgshkx/2022nd1q/202208/t20220822_5474690.shtml)。不机械套用东夷／西戎／南蛮／北狄四个整齐象限。
 
 验证：`node verify-cultural-regions.mjs` 检查所有可玩格、城市不受染色覆盖，名称落在本区陆地，水面不染色；以 `SCENARIO=sanguo` 再跑验证可选层。另跑 `verify-territory.mjs` 和两剧本 `verify-scenarios.mjs`，浏览器检查远览、图层开关及势力情报。
+
+## 国家模拟 v1（2026-09-24）
+
+共用引擎已接入国家内政、军事出征、迎战、野战、攻城易主、盟约与停战，详见 [国家模拟说明](STATE_SIMULATION.md)。此项取代本文旧段落中尚无外交／战斗的描述。主角本队仍为独立行军验证部队，暂不参与自动战斗；原 `/lab/` 不变，外围族群仍为显示层。
