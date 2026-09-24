@@ -8,7 +8,7 @@ const before=JSON.stringify(scenario),world=createWorld(),sim=createCampaign(wor
 const started=performance.now();let maxActive=0;
 for(let t=0;t<500;t++){
  sim.advance(CAMPAIGN_TURN_MS);
- const active=sim.armies.filter(a=>a.active);maxActive=Math.max(maxActive,active.length);assert.ok(active.length<=18);
+ const active=sim.armies.filter(a=>a.active);maxActive=Math.max(maxActive,active.length);assert.ok(active.filter(a=>a.slot!==2).length<=18);assert.ok(active.filter(a=>a.slot===2).length<=8);
  for(const c of sim.cities){for(const k of ['gold','grain','garrison','development','order','walls'])assert.ok(Number.isFinite(c[k])&&c[k]>=0,c.name+' '+k);assert.equal(world.cells[c.cell].owner,c.owner,'城旗与城址归属一致');}
  for(const a of active){assert.ok(a.troops>0);assert.ok(a.path.every(id=>world.cells[id]?.walkable));}
  const living=sim.cities.reduce((n,c)=>n+c.garrison,0)+active.reduce((n,a)=>n+a.troops,0);

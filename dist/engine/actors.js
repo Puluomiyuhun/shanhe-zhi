@@ -3,7 +3,7 @@ import {cities} from './world.js';
 
 // Scenario actors: finite forces, no spawning, no battle resolution or automatic conquest.
 export const actorDefinitions=scenario.actors;
-export function cityAt(x,z){return cities.find(c=>Math.hypot(c.x-x,c.z-z)<2.8)||null;}
+export function cityAt(x,z,towns=cities){return towns.find(c=>Math.hypot(c.x-x,c.z-z)<2.8)||null;}
 export function createActors(world,onEvent=()=>{},options={}){
  let time=0;
  const cityByName=name=>cities.find(c=>c.name===name);

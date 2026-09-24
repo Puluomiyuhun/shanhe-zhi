@@ -18,7 +18,7 @@ export function createIntelligence({getWorld,getSimulation,inspectActor,cities:i
  function render(){
   if(!dialog.open)return;
   dialog.classList.toggle('roster-view',['roster','cities','unit','realm','diplomacy'].includes(view));
-  const cities=getSimulation().campaign?.cities||initialCities;const w=getWorld(),c=w.cells[w.unit.cell],supply=w.supplied();
+  const factions=getSimulation().campaign.factions,cities=getSimulation().campaign?.cities||initialCities;const w=getWorld(),c=w.cells[w.unit.cell],supply=w.supplied();
   document.getElementById('intelTitle').textContent={realm:'势力情报',diplomacy:'外交情报',cities:'城市情报',officer:'人物与指令',roster:format('{officer}名录'),unit:'部队情报',journal:'军情簿'}[view];
   for(const b of dialog.querySelectorAll('[data-view]'))b.setAttribute('aria-pressed',String(b.dataset.view===view));
   let html='';

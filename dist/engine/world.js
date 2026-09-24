@@ -21,7 +21,9 @@ export function height(x,z){
  return bank<.1?.04:base*smooth(.1,2.6,bank);
 }
 export {factions,cities} from './scenario.js';
-export const faction=id=>factions.find(f=>f.id===id)||factions[0];
+let factionResolver=null;
+export const setFactionResolver=resolver=>{factionResolver=resolver;};
+export const faction=id=>factionResolver?.(id)||factions.find(f=>f.id===id)||factions[0];
 
 const territoryWeight=scenario.map.territoryWeights;
 export function initialOwner(x,z){let best=Infinity,owner=scenario.player.owner;const wx=x+Math.sin(z*.09)*2,wz=z+Math.sin(x*.08)*2;for(const c of cities){const d=((wx-c.x)**2*(scenario.map.territoryAxes[c.owner]?.[0]??1)+(wz-c.z)**2*(scenario.map.territoryAxes[c.owner]?.[1]??1))*(territoryWeight[c.owner]??1);if(d<best){best=d;owner=c.owner;}}return owner;}

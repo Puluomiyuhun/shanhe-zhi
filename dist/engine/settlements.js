@@ -19,3 +19,6 @@ export function createSettlements(world){
  return sites;
 }
 export function settlementAt(sites,x,z){return sites.find(s=>Math.hypot(s.x-x,s.z-z)<2.6);}
+
+// Sparse inherited hamlets; economic facilities are now constructed by the AI.
+export const createInitialScenery=world=>createSettlements(world).filter(s=>s.kind==='village').filter((s,i)=>i%4===0);
