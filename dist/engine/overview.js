@@ -6,13 +6,13 @@ import {height} from './world.js';
 
 // Both zoom levels share the same geometry, city positions and ownership buffers.
 export function createOverview({scene,root,terrain,details,ownerMaterial,gridMaterial,light,water}){
- const mix={value:0};
+ const mix={value:0},cultureVisible={value:1};
  terrain.material.onBeforeCompile=shader=>{
-  shader.uniforms.uOverview=mix;
-  shader.vertexShader='attribute vec3 overviewColor;\nuniform float uOverview;\n'+shader.vertexShader;
-  shader.vertexShader=shader.vertexShader.replace('#include <color_vertex>','#include <color_vertex>\nvColor.xyz = mix(vColor.xyz, overviewColor, uOverview);');
+  shader.uniforms.uOverview=mix;shader.uniforms.uCultureVisible=cultureVisible;
+  shader.vertexShader='attribute vec3 overviewColor;\nattribute vec4 culturalTint;\nuniform float uCultureVisible;\nuniform float uOverview;\n'+shader.vertexShader;
+  shader.vertexShader=shader.vertexShader.replace('#include <color_vertex>','#include <color_vertex>\nvColor.xyz = mix(vColor.xyz, overviewColor, uOverview);\nvColor.xyz=mix(vColor.xyz,culturalTint.rgb,culturalTint.a*uCultureVisible*mix(.45,.64,uOverview));');
  };
- terrain.material.customProgramCacheKey=()=> 'terrain-overview-v1';
+ terrain.material.customProgramCacheKey=()=> 'terrain-overview-cultural-v2';
  // Mask ownership in fragment space so coarse hex triangles never paint over narrow rivers.
  const span=Math.max((scenario.map.activeExtent||scenario.map.extent).x,(scenario.map.activeExtent||scenario.map.extent).z)+12;
  const size=512,mask=new Uint8Array(size*size);
@@ -39,7 +39,7 @@ export function createOverview({scene,root,terrain,details,ownerMaterial,gridMat
  return{
   amount:0,
   update(distance,showGrid,showOwner,border){
-   const amount=THREE.MathUtils.smoothstep(distance,160,310);this.amount=amount;mix.value=amount;
+   const amount=THREE.MathUtils.smoothstep(distance,160,310);this.amount=amount;mix.value=amount;cultureVisible.value=showOwner?1:0;
    root.scale.y=THREE.MathUtils.lerp(1,.76,amount);
    terrain.material.bumpScale=.085*(1-amount);
    ownerMaterial.opacity=THREE.MathUtils.lerp(.30,.56,amount);

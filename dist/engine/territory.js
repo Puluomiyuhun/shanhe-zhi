@@ -2,6 +2,9 @@ import {scenario} from './runtime.js';
 const outline=scenario.map.playableOutline;
 export function territoryDistance(x,z){
  if(!outline)return Math.min(scenario.map.extent.x-Math.abs(x),scenario.map.extent.z-Math.abs(z));
+ return polygonDistance(outline,x,z);
+}
+export function polygonDistance(outline,x,z){
  let inside=false,dist=Infinity;
  for(let i=0,j=outline.length-1;i<outline.length;j=i++){
   const a=outline[j],b=outline[i],dx=b[0]-a[0],dz=b[1]-a[1],len=dx*dx+dz*dz,t=len?Math.max(0,Math.min(1,((x-a[0])*dx+(z-a[1])*dz)/len)):0;

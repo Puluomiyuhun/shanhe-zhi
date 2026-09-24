@@ -19,6 +19,7 @@ export function validateScenario(s){
  for(const p of s.map.crossings)need([p.x,p.z,p.dx,p.dz,p.width].every(finite)&&p.width>0,'渡口：'+p.name);
  for(const r of s.map.roadLinks)need(towns.has(r.from)&&towns.has(r.to),'道路端点：'+r.name);
  if(s.map.playableOutline)need(s.map.playableOutline.length>=3&&s.map.playableOutline.every(p=>p.length===2&&p.every(finite)),'疆域轮廓');
+ if(s.map.culturalRegions){need(Array.isArray(s.map.culturalRegions),'族群分布层');need(new Set(s.map.culturalRegions.map(r=>r.id)).size===s.map.culturalRegions.length,'重复族群ID');for(const r of s.map.culturalRegions)need(typeof r.id==='string'&&typeof r.name==='string'&&typeof r.region==='string'&&typeof r.description==='string'&&/^#[0-9a-f]{6}$/i.test(r.color)&&r.label?.length===2&&r.label.every(finite)&&r.outline?.length>=3&&r.outline.every(p=>p.length===2&&p.every(finite)),'族群区域：'+r.name);}
  if(s.map.coast){for(const axis of ['projectionX','projectionZ']){const k=s.map.coast[axis];need(k?.length>1&&k.every((p,i)=>p.length===2&&p.every(finite)&&(!i||p[0]>k[i-1][0])),axis+'映射无效');}need(s.map.coast.offset?.length===2&&s.map.coast.offset.every(finite),'海岸偏移');}
  return s;
 }

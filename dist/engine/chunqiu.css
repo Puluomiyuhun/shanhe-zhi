@@ -25,3 +25,7 @@ header{background:linear-gradient(110deg,#25211bef,#302921e9 82%,#342d2399)}
 .sea-label{position:absolute;left:0;top:0;transform:translate(-50%,-50%);pointer-events:none;color:#d1e1d9;font:600 25px/1.2 "Microsoft YaHei",sans-serif;letter-spacing:.38em;text-shadow:0 2px 7px #163a4c,0 0 22px #163a4c;opacity:.84;white-space:nowrap}.sea-label[hidden]{display:none}
 
 .geography-label.settlement{color:#e7d9b6;font-size:11px;letter-spacing:.05em;opacity:.9;text-shadow:0 1px 3px #30291f;background:rgba(38,33,26,.36);padding:2px 5px;border-bottom:1px solid #b2a17b55}
+
+.strategic-view .realm-label.cultural-label{font-size:25px;letter-spacing:5px;color:#e3ddcd;opacity:.92;font-weight:700}
+.strategic-view .cultural-label span{display:block;font:10px/1.6 "Microsoft YaHei",sans-serif;letter-spacing:3px;color:#e3ddcd}
+.cultural-ledger{border-top:1px solid #bba37355;padding-top:14px;margin-top:16px;color:#e1d6c1}.cultural-ledger summary{cursor:pointer;font-size:15px}.cultural-ledger>div{padding:12px 4px;border-bottom:1px solid #bba37322}.cultural-ledger strong{font-size:16px}.cultural-ledger>div>span{margin-left:18px;color:#b6ad9e;font-size:13px}.cultural-ledger p{margin:7px 0 0;font-size:13px;line-height:1.7;color:#c4baaa}
