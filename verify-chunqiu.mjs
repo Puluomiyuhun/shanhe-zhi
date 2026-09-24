@@ -3,7 +3,7 @@ import {createWorld,cities,factions} from './dist/engine/world.js';
 import {createActors,actorDefinitions} from './dist/engine/actors.js';
 import {officers,officersInCity,rosterMarkup} from './dist/engine/roster.js';
 const t=performance.now(),w=createWorld(),sim=createActors(w);
-assert.equal(w.cells.length,6708);assert.equal(factions.length,28);assert.equal(cities.length,38);assert.equal(officers.length,146);
+assert.equal(w.cells.length,13011);assert.equal(factions.length,28);assert.equal(cities.length,38);assert.equal(officers.length,146);
 assert.equal(new Set(officers.map(o=>o.name)).size,officers.length);
 assert.equal(new Set(cities.map(c=>c.name)).size,cities.length);
 const failures=[];
@@ -18,3 +18,4 @@ assert.ok(sim.actors.every(a=>a.steps>0));
 const target=w.nearest(cities[1].x,cities[1].z);w.unit.path=w.route(w.unit.cell,target.id).path.slice(1);while(w.unit.path.length)assert.ok(w.step());assert.ok(w.unit.morale>0);
 assert.ok(rosterMarkup(0,{faction:'晋军'},sim).includes('晋文公'));
 console.log(JSON.stringify({cells:w.cells.length,factions:factions.length,cities:cities.length,officers:officers.length,activeActors:sim.actors.length,allCitiesReachable:true,minResidents:Math.min(...cities.map(c=>officersInCity(c.name,sim).length)),ai:sim.actors.map(a=>({name:a.name,steps:a.steps,trips:a.trips})),verificationMs:Math.round(performance.now()-t)}));
+

@@ -12,8 +12,8 @@ export default {
   "officer": "卿士"
  },
  "map": {
-  "cols": 78,
-  "rows": 86,
+  "cols": 134,
+  "rows": 142,
   "size": 1.2,
   "extent": {
    "x": 81,
@@ -1068,7 +1068,110 @@ export default {
     "description": "参考齐故城冶铸业遗存表现作坊。遗存跨越多个时代，此处建筑与位置为演练概化。",
     "source": "https://www.cssn.cn/kgxc/kgxc_kghs/202207/t20220728_5430897.shtml"
    }
-  }
+  },
+  "playableOutline": [
+   [
+    -123,
+    -34
+   ],
+   [
+    -112,
+    -68
+   ],
+   [
+    -86,
+    -95
+   ],
+   [
+    -54,
+    -104
+   ],
+   [
+    -23,
+    -98
+   ],
+   [
+    7,
+    -103
+   ],
+   [
+    40,
+    -115
+   ],
+   [
+    81,
+    -107
+   ],
+   [
+    110,
+    -86
+   ],
+   [
+    136,
+    -58
+   ],
+   [
+    140,
+    -21
+   ],
+   [
+    121,
+    11
+   ],
+   [
+    113,
+    45
+   ],
+   [
+    99,
+    79
+   ],
+   [
+    84,
+    110
+   ],
+   [
+    50,
+    122
+   ],
+   [
+    17,
+    112
+   ],
+   [
+    -8,
+    104
+   ],
+   [
+    -33,
+    91
+   ],
+   [
+    -60,
+    106
+   ],
+   [
+    -89,
+    99
+   ],
+   [
+    -111,
+    78
+   ],
+   [
+    -116,
+    43
+   ],
+   [
+    -130,
+    9
+   ]
+  ],
+  "activeExtent": {
+   "x": 142,
+   "z": 125
+  },
+  "playableCellCount": 13011
  },
  "factions": [
   {
@@ -1090,8 +1193,8 @@ export default {
    "color": "#c74845",
    "ruler": "楚庄王",
    "label": [
-    -16,
-    47
+    -15,
+    71
    ],
    "showLabel": true
   },
@@ -1102,8 +1205,8 @@ export default {
    "color": "#548cbd",
    "ruler": "齐桓公",
    "label": [
-    53,
-    -42
+    76,
+    -35
    ],
    "showLabel": true
   },
@@ -1114,8 +1217,8 @@ export default {
    "color": "#acb0bc",
    "ruler": "秦穆公",
    "label": [
-    -64,
-    -29
+    -92,
+    -34
    ],
    "showLabel": true
   },
@@ -1234,8 +1337,8 @@ export default {
    "color": "#789dae",
    "ruler": "燕桓侯",
    "label": [
-    36,
-    -67
+    40,
+    -87
    ],
    "showLabel": true
   },
@@ -1246,8 +1349,8 @@ export default {
    "color": "#599b9f",
    "ruler": "阖闾",
    "label": [
-    69,
-    47
+    81,
+    46
    ],
    "showLabel": true
   },
@@ -1258,8 +1361,8 @@ export default {
    "color": "#769157",
    "ruler": "勾践",
    "label": [
-    70,
-    69
+    76,
+    91
    ],
    "showLabel": true
   },
@@ -1354,10 +1457,10 @@ export default {
    "color": "#78906b",
    "ruler": "巴曼子",
    "label": [
-    -51,
-    59
+    -56,
+    77
    ],
-   "showLabel": false
+   "showLabel": true
   },
   {
    "id": 25,
@@ -1366,10 +1469,10 @@ export default {
    "color": "#9980b2",
    "ruler": "鳖灵",
    "label": [
-    -72,
-    67
+    -85,
+    81
    ],
-   "showLabel": false
+   "showLabel": true
   },
   {
    "id": 26,
