@@ -97,3 +97,9 @@ Sites 的 `.openai/` 配置未进入 GitHub。新电脑若只 clone 仓库，应
 ## 军令与情报 UI
 
 最新样式覆盖为 `dist/lab/interface.css`；悬停浮层由 `map-peek.js` 管理，不能改旗牌尺寸。`intelligence.js` 城市路线缓存需随世界、玩家格子与封锁状态失效。修改菜单时保留 citiesInfo / unitsInfo 等侧栏依赖的 ID；顶部列表与地图对象侧栏分工不同。
+
+## 驻城名录与缩放性能
+
+`officer-data.js` 扩充角色，`portrait-data.js` 与 assets/portraits 管理 30 张对应头像。驻城查询使用 `officersInCity`，动态武将按实时位置计算，不能又显示在老驻地。没有头像时保留姓名章。城市侧栏不要每 400 ms 无条件重建人物 DOM。
+
+`terrain-picking.js` 的 100 个分区共用原始顶点，不能加入 scene；未来变更地形顶点后需要同步包围盒。`performance-probe.js` 提供固定路线的 18 秒缩放测量；结果是本机观测。回归追加 `node verify-roster.mjs`、`node verify-terrain-picking.mjs`。后者较慢，因为同时测原始全网格作等价性和性能对照。

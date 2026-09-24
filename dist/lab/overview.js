@@ -40,7 +40,7 @@ export function createOverview({scene,root,terrain,details,ownerMaterial,gridMat
    relief.material.opacity=amount*.055;road.material.opacity=amount*.55;
    terrain.material.emissive.set('#b8b5a0');terrain.material.emissiveIntensity=amount*.025;
    gridMaterial.opacity=showGrid?THREE.MathUtils.clamp((260-distance)/800,.035,.25):0;
-   light.intensity=THREE.MathUtils.lerp(2.5,2.2,amount);light.castShadow=amount<.9;water.material.bumpScale=.035*(1-amount);water.material.metalness=.2*(1-amount);water.material.roughness=.32+.5*amount;
+   light.intensity=THREE.MathUtils.lerp(2.5,2.2,amount);light.shadow.intensity=1-THREE.MathUtils.smoothstep(amount,.72,1);water.material.bumpScale=.035*(1-amount);water.material.metalness=.2*(1-amount);water.material.roughness=.32+.5*amount;
    scene.background.copy(nearColor).lerp(farColor,amount);scene.fog.color.copy(scene.background);
    scene.fog.near=THREE.MathUtils.lerp(230,450,amount);scene.fog.far=THREE.MathUtils.lerp(470,850,amount);
    if(border){border.material.color.set(amount>.6?'#b9a36e':'#eed591');border.material.opacity=.85;border.renderOrder=6;}
@@ -48,7 +48,6 @@ export function createOverview({scene,root,terrain,details,ownerMaterial,gridMat
    for(const obj of details)obj.visible=!obj.userData.smallDetail||amount<.88;
    if(previousMode!==strategic){document.body.classList.toggle('strategic-view',strategic);document.getElementById('viewMode').textContent=strategic?'战略总览':'地形近览';previousMode=strategic;}
    document.getElementById('realmLabels').hidden=!strategic||!showOwner;
-   root.updateMatrixWorld(true);
    return amount;
   }
  };

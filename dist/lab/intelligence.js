@@ -1,5 +1,5 @@
 import {factions,faction} from './world.js';
-import {rosterMarkup,rosterRows} from './roster.js';
+import {rosterMarkup,rosterRows,officersInCity} from './roster.js';
 // Object-focused information and orders share the live map state.
 export function createIntelligence({getWorld,getSimulation,inspectActor,cities,pause,focusCity,focusUnit,plan,standby}){
  const dialog=document.getElementById('intelligence'),content=document.getElementById('intelContent');
@@ -7,7 +7,7 @@ export function createIntelligence({getWorld,getSimulation,inspectActor,cities,p
  let cachedWorld=null,cachedCell=-1,cachedBlocked=null,routeCache=new Map();
  function routeTo(w,city){if(w!==cachedWorld||w.unit.cell!==cachedCell||w.blocked!==cachedBlocked){cachedWorld=w;cachedCell=w.unit.cell;cachedBlocked=w.blocked;routeCache.clear();}if(!routeCache.has(city.name))routeCache.set(city.name,w.route(w.unit.cell,w.nearest(city.x,city.z).id));return routeCache.get(city.name);}
  let cityFaction='all';
- let view='realm',cityName=cities[0].name,entries=[],selectedOfficer=0;const rosterOptions={faction:"all",sort:-1,descending:true};
+ let view='realm',cityName=cities[0].name,entries=[],selectedOfficer=0;const rosterOptions={city:"all",faction:"all",sort:-1,descending:true};
  const owner=id=>faction(id).name;
  const button=(action,text,disabled=false)=>`<button data-action="${action}" ${disabled?'disabled':''}>${text}</button>`;
  const datum=(label,value)=>`<div><dt>${label}</dt><dd>${value}</dd></div>`;
@@ -26,10 +26,10 @@ export function createIntelligence({getWorld,getSimulation,inspectActor,cities,p
    html+='</tbody></table></div><p class="intel-note">归属为地图演练配置，非历史复原。土地随占领变化；城市归属固定，财政、外交和攻防尚未接入。</p>';
   }else if(view==='cities'){
    const city=cities.find(x=>x.name===cityName)||cities[0],target=w.nearest(city.x,city.z),route=routeTo(w,city),steps=route?route.path.length-1:null;
-   html=`<div class="roster-toolbar"><div><strong>城市一览</strong><span>${cities.filter(c=>cityFaction==='all'||String(c.owner)===cityFaction).length} / ${cities.length} 城</span></div><label>势力 <select id="cityFactionFilter"><option value="all">全部势力</option>${factions.map(f=>`<option value="${f.id}" ${cityFaction===String(f.id)?'selected':''}>${f.name}</option>`).join('')}</select></label></div><div class="city-intel-layout"><div class="city-list officer-table-scroll"><table class="officer-table"><thead><tr><th>城市</th><th>势力</th><th>地形</th><th>距本队</th></tr></thead><tbody>`;
-   for(const item of cities.filter(c=>cityFaction==='all'||String(c.owner)===cityFaction)){const r=routeTo(w,item);html+=`<tr data-city="${item.name}" class="${city.name===item.name?'is-selected':''}"><th><button data-city="${item.name}" aria-pressed="${city.name===item.name}">${item.name}</button></th><td><i class="realm-dot" style="background:${faction(item.owner).color}"></i>${owner(item.owner)}</td><td>${w.nearest(item.x,item.z).terrain}</td><td>${r?r.path.length-1+' 格':'不可达'}</td></tr>`;}
+   html=`<div class="roster-toolbar"><div><strong>城市一览</strong><span>${cities.filter(c=>cityFaction==='all'||String(c.owner)===cityFaction).length} / ${cities.length} 城</span></div><label>势力 <select id="cityFactionFilter"><option value="all">全部势力</option>${factions.map(f=>`<option value="${f.id}" ${cityFaction===String(f.id)?'selected':''}>${f.name}</option>`).join('')}</select></label></div><div class="city-intel-layout"><div class="city-list officer-table-scroll"><table class="officer-table"><thead><tr><th>城市</th><th>势力</th><th>地形</th><th>驻将</th><th>距本队</th></tr></thead><tbody>`;
+   for(const item of cities.filter(c=>cityFaction==='all'||String(c.owner)===cityFaction)){const r=routeTo(w,item);html+=`<tr data-city="${item.name}" class="${city.name===item.name?'is-selected':''}"><th><button data-city="${item.name}" aria-pressed="${city.name===item.name}">${item.name}</button></th><td><i class="realm-dot" style="background:${faction(item.owner).color}"></i>${owner(item.owner)}</td><td>${w.nearest(item.x,item.z).terrain}</td><td>${officersInCity(item.name,getSimulation()).length}</td><td>${r?r.path.length-1+' 格':'不可达'}</td></tr>`;}
    html+='</tbody></table>';
-   html+=`</div><section class="intel-card city-dossier"><div class="dossier-top"><span class="city-emblem" aria-hidden="true">城</span><div><small>${city.owner===1?'己方据点':'对方据点'}</small><h3>${city.name}</h3><p>${owner(city.owner)}军</p></div></div><dl class="intel-stats">${datum('行军距离',steps===null?'无可达路线':steps===0?'已在城址':steps+' 格')}${datum('预计成本',route?route.cost.toFixed(1):'—')}${datum('城址地形',target.terrain)}${datum('出发部队','沈行舟 · 1,200')}</dl><p class="intel-note">${city.name==='襄阳'?'汉水以南，先遣部队的出发地与补给源。':city.name==='新野'?'沿官道北上，途中须经汉水渡桥。':'本轮演练据点，可查看地形与抵近路线，暂不进行攻城。'}</p><div class="intel-actions">${button('locate-city','地图定位')}${button('plan-city',steps===0?'已在此地':'移动至此',!route||steps===0||w.unit.morale<=0)}</div></section></div>`;
+   html+=`</div><section class="intel-card city-dossier"><div class="dossier-top"><span class="city-emblem" aria-hidden="true">城</span><div><small>${city.owner===1?'己方据点':'对方据点'}</small><h3>${city.name}</h3><p>${owner(city.owner)}军</p></div></div><dl class="intel-stats">${datum('行军距离',steps===null?'无可达路线':steps===0?'已在城址':steps+' 格')}${datum('预计成本',route?route.cost.toFixed(1):'—')}${datum('城址地形',target.terrain)}${datum('出发部队','沈行舟 · 1,200')}</dl><p class="intel-note">${city.name==='襄阳'?'汉水以南，先遣部队的出发地与补给源。':city.name==='新野'?'沿官道北上，途中须经汉水渡桥。':'本轮演练据点，可查看地形与抵近路线，暂不进行攻城。'}</p><div class="intel-actions">${button('city-officers','驻将名录 · '+officersInCity(city.name,getSimulation()).length)}${button('locate-city','地图定位')}${button('plan-city',steps===0?'已在此地':'移动至此',!route||steps===0||w.unit.morale<=0)}</div></section></div>`;
   }else if(view==='officer'){
    html=`<div class="personal-banner"><div class="dossier-portrait"><img src="assets/zhao-yun.png" alt="赵云立绘暂代沈行舟"></div><div><small>你扮演的武将</small><h3>沈行舟</h3><p>刘表麾下 · 先遣部队指挥</p></div><span class="mode-tag">单武将模式</span></div><dl class="intel-stats four">${datum('可指挥兵力','1,200')}${datum('所在位置',c.terrain+' · '+c.q+','+c.r)}${datum('部队士气',w.unit.morale)}${datum('补给状态',supply?'连通':'中断')}</dl><h4>当前可下达的指令</h4><div class="personal-orders"><button data-action="choose-march"><b>行 军</b><span>右键地图目的地，立即下令并开始移动。</span></button><button data-action="standby"><b>原地待命</b><span>停止推进，撤销本队尚未完成的路线。</span></button><button data-action="return" ${w.unit.cell===w.origin.id||w.unit.morale<=0?'disabled':''}><b>返回襄阳</b><span>立即沿可达路线返回襄阳。</span></button></div><p class="intel-note">当前身份可指挥本队；城市任免、全势力外交不属于本队指令。演练头像暂借赵云立绘。</p><details class="future-roles"><summary>后续角色玩法方向</summary><p>拟接入：交游拜访、修习能力、接受任务、仕官与升迁；获得职位后逐步开放内政与提案。这些玩法尚未接入三维样区。</p></details>`;
   }else if(view==='roster'){
@@ -44,18 +44,19 @@ export function createIntelligence({getWorld,getSimulation,inspectActor,cities,p
  }
  function open(next='realm',selectedCity){pause();view=next;if(selectedCity)cityName=selectedCity;if(!dialog.open)dialog.showModal();render();}
  function close(){dialog.close();}
- dialog.addEventListener('change',e=>{if(e.target.id==='cityFactionFilter'){cityFaction=e.target.value;cityName=cities.find(c=>cityFaction==='all'||String(c.owner)===cityFaction).name;render();content.querySelector('#cityFactionFilter').focus();return;}if(e.target.id==='rosterFaction'){rosterOptions.faction=e.target.value;const rows=rosterRows(rosterOptions);if(!rows.some(o=>o.id===selectedOfficer))selectedOfficer=rows[0].id;render();content.querySelector('#rosterFaction').focus({preventScroll:true});}});
+ dialog.addEventListener('change',e=>{if(e.target.id==='cityFactionFilter'){cityFaction=e.target.value;cityName=cities.find(c=>cityFaction==='all'||String(c.owner)===cityFaction).name;render();content.querySelector('#cityFactionFilter').focus();return;}if(['rosterFaction','rosterCity'].includes(e.target.id)){const key=e.target.id;rosterOptions[key==='rosterCity'?'city':'faction']=e.target.value;const rows=rosterRows(rosterOptions,getSimulation());if(!rows.some(o=>o.id===selectedOfficer))selectedOfficer=rows[0]?.id??-1;render();content.querySelector('#'+key).focus({preventScroll:true});}});
  document.getElementById('closeIntel').onclick=close;
  document.getElementById('intelTabs').innerHTML=tabs.map(([key,name])=>`<button data-view="${key}" aria-pressed="false">${name}</button>`).join('');
  dialog.addEventListener('click',e=>{
   const sortButton=e.target.closest('[data-roster-sort]');if(sortButton){const i=Number(sortButton.dataset.rosterSort);rosterOptions.descending=rosterOptions.sort===i?!rosterOptions.descending:true;rosterOptions.sort=i;render();content.querySelector('[data-roster-sort="'+i+'"]').focus({preventScroll:true});return;}
-  const officerButton=e.target.closest('[data-officer]');if(officerButton){selectedOfficer=Number(officerButton.dataset.officer);render();content.querySelector('button[data-officer="'+selectedOfficer+'"]').focus({preventScroll:true});return;}
+  const officerButton=e.target.closest('[data-officer]');if(officerButton){const scroll=content.querySelector('.officer-table-scroll')?.scrollTop||0;selectedOfficer=Number(officerButton.dataset.officer);render();content.querySelector('.officer-table-scroll').scrollTop=scroll;content.querySelector('button[data-officer="'+selectedOfficer+'"]').focus({preventScroll:true});return;}
   const viewButton=e.target.closest('[data-view]');if(viewButton){view=viewButton.dataset.view;render();return;}
   const cityButton=e.target.closest('[data-city]');if(cityButton){cityName=cityButton.dataset.city;const scroll=content.querySelector('.city-list').scrollTop;render();content.querySelector('.city-list').scrollTop=scroll;content.querySelector('button[data-city="'+cityName+'"]').focus({preventScroll:true});return;}
   const action=e.target.closest('[data-action]')?.dataset.action;if(!action)return;
   const city=cities.find(c=>c.name===cityName)||cities[0];
   if(action.startsWith('watch-')){close();inspectActor(action.slice(6));}
   else if(action.startsWith('cities-')){cityFaction=action.split('-')[1];cityName=cities.find(c=>c.owner===Number(cityFaction)).name;view='cities';render();}
+  else if(action==='city-officers'){rosterOptions.city=city.name;rosterOptions.faction='all';selectedOfficer=officersInCity(city.name,getSimulation())[0]?.id??-1;view='roster';render();}
   else if(action==='locate-city'){close();focusCity(city);}
   else if(action==='plan-city'){close();plan(city);}
   else if(action==='locate-unit'){close();focusUnit();}
@@ -63,5 +64,5 @@ export function createIntelligence({getWorld,getSimulation,inspectActor,cities,p
   else if(action==='standby'){standby();render();}
   else if(action==='return'){close();plan(cities[0]);}
  });
- return{open,refresh:render,record(text){entries.push({step:getWorld().unit.steps,text});entries=entries.slice(-40);render();},reset(){entries=[];render();}};
+ return{open,openOfficer(id){rosterOptions.city='all';rosterOptions.faction='all';selectedOfficer=id;open('roster');content.querySelector('tr.is-selected')?.scrollIntoView({block:'nearest'});},refresh:render,record(text){entries.push({step:getWorld().unit.steps,text});entries=entries.slice(-40);render();},reset(){entries=[];render();}};
 }

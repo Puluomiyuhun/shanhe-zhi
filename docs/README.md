@@ -30,3 +30,5 @@
 素材出处见 [CREDITS](../dist/lab/assets/CREDITS.md)，Three.js 许可证见 [LICENSE](../dist/lab/vendor/LICENSE)。
 
 - [军令与情报界面改进（2026-09-24）](COMMAND_INTELLIGENCE_UI.md)
+
+- [武将扩充与缩放性能（89 人 / 30 头像）](ROSTER_ZOOM_PERFORMANCE.md)
