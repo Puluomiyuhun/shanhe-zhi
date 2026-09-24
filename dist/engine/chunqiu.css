@@ -21,3 +21,5 @@ header{background:linear-gradient(110deg,#25211bef,#302921e9 82%,#342d2399)}
 .geography-label[hidden]{display:none}
 
 .geography-label.lake{color:#d4ede4;font-size:13px;letter-spacing:2px}
+
+.sea-label{position:absolute;left:0;top:0;transform:translate(-50%,-50%);pointer-events:none;color:#d1e1d9;font:600 25px/1.2 "Microsoft YaHei",sans-serif;letter-spacing:.38em;text-shadow:0 2px 7px #163a4c,0 0 22px #163a4c;opacity:.84;white-space:nowrap}.sea-label[hidden]{display:none}

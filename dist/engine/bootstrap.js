@@ -10,7 +10,7 @@ if(!id){
   const html=format(await response.text()),doc=new DOMParser().parseFromString(html,'text/html');
   document.title='山河志 · '+scenario.title;document.body.replaceChildren(...doc.body.childNodes);
   await Promise.all([...doc.querySelectorAll('link[rel=stylesheet]')].map(link=>new Promise((resolve,reject)=>{const el=document.createElement('link');el.rel='stylesheet';el.href=link.getAttribute('href');el.onload=resolve;el.onerror=()=>reject(new Error('样式加载失败'));document.head.append(el);}))); 
-  const note=document.querySelector('#guide details p');if(note)note.textContent=scenario.description+' '+scenario.factions.length+'方势力、'+scenario.cities.length+'城、'+scenario.officers.length+'名人物、'+scenario.actors.length+'名活动角色。湖泊与险山不可走，河流经津渡通行。当前尚无正式战斗与人物成长。';
+  const note=document.querySelector('#guide details p');if(note)note.textContent=scenario.description+' '+scenario.factions.length+'方势力、'+scenario.cities.length+'城、'+scenario.officers.length+'名人物、'+scenario.actors.length+'名活动角色。湖泊、海域与险山不可走，河流经津渡通行。沿海为现代轮廓适配的地理背景，并非古海岸精确复原；未染色外围尚不可行军。当前尚无正式战斗与人物成长。';
   document.querySelectorAll('#guide details p').forEach((p,i)=>{if(i>0)p.remove();});
   document.querySelector('.chapter b').textContent=scenario.subtitle;
   await import('./main.js');

@@ -20,12 +20,13 @@ export default {
    "z": 101
   },
   "initialDistance": 200,
-  "farDistance": 350,
+  "farDistance": 550,
   "blockade": [
    10,
    15
   ],
-  "terrainSize": 460,
+  "backgroundSize": 560,
+  "terrainSize": 360,
   "segments": 480,
   "territoryWeights": {},
   "territoryAxes": {},
@@ -240,7 +241,109 @@ export default {
    }
   ],
   "landmarks": [],
-  "roadLinks": []
+  "roadLinks": [],
+  "coast": {
+   "projectionX": [
+    [
+     95,
+     -190
+    ],
+    [
+     104,
+     -95
+    ],
+    [
+     110,
+     -48
+    ],
+    [
+     114,
+     8
+    ],
+    [
+     117,
+     52
+    ],
+    [
+     120,
+     91
+    ],
+    [
+     123,
+     132
+    ],
+    [
+     130,
+     200
+    ],
+    [
+     135,
+     235
+    ]
+   ],
+   "projectionZ": [
+    [
+     18,
+     182
+    ],
+    [
+     20,
+     163
+    ],
+    [
+     24,
+     133
+    ],
+    [
+     28,
+     95
+    ],
+    [
+     30,
+     71
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     34,
+     14
+    ],
+    [
+     36,
+     -22
+    ],
+    [
+     38,
+     -48
+    ],
+    [
+     40,
+     -75
+    ],
+    [
+     44,
+     -120
+    ],
+    [
+     48,
+     -165
+    ]
+   ],
+   "offset": [
+    55,
+    30
+   ]
+  },
+  "overviewTarget": [
+   45,
+   35
+  ],
+  "cameraExtent": {
+   "x": 210,
+   "z": 205
+  }
  },
  "factions": [
   {

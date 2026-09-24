@@ -31,3 +31,11 @@
 ## 验证
 
 `node verify-chunqiu.mjs`、`node verify-chunqiu-geography.mjs` 检查春秋共用引擎；`node verify-scenarios.mjs` 分别在两个 SCENARIO 下验证城池可达、居民、AI 180 秒模拟、悬浮限频、近远网格以及错误配置。浏览器验收另含两剧本名录与近远景。悬浮高频输入为逻辑回归，不能代替所有设备上的实测。
+
+## 大陆海岸背景（2026-09-24）
+
+共用引擎接入 `geography/east-asia-land.js`，`engine/coast.js` 将 Natural Earth 外环经剧本映射生成一次性的 721² 岸距场。查询 O(1)，无逐帧遍历海岸。远景显示渤海、黄海、东海、南海；海底下沉避免海面与地形 z-fighting，沿岸浅色渐变使用单通道纹理。
+
+中心 ±110 单位保留原地形顶点间距，只延展外围顶点；地形仍为 480² 网格。海面增加一个双三角形绘制对象，四个 DOM 海名；模拟格子和 AI 数量不变。两剧本的 cameraExtent、overviewTarget、farDistance 独立配置。大陆背景不等于全国可玩范围。原 /lab/ 不变。
+
+海域接入水岸、地块通行和领土遮罩；春秋有 88 格判为不可走海域，三国可玩区仍在内陆。所有城市保持距海岸大于3单位且可达。`node verify-coast.mjs` 在两个 SCENARIO 下检查海名在水上、海格不可行、海南台湾与内陆采样为陆地、城市未淹没。地理来源及推测边界见 dist/geography/README.md。未做前台 GPU 帧率基准。
