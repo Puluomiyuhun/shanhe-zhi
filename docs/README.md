@@ -32,3 +32,8 @@
 - [军令与情报界面改进（2026-09-24）](COMMAND_INTELLIGENCE_UI.md)
 
 - [武将扩充与缩放性能（89 人 / 30 头像）](ROSTER_ZOOM_PERFORMANCE.md)
+
+
+## 春秋群英（2026-09-24）
+
+新增独立 `/chunqiu/` 剧本：28势力、38城、146人、10名活动AI、6708格。三国默认入口与系统保持不变。用户已确认跨时代同台；详见 [场景记录](CHUNQIU_SCENARIO.md)。验证：`node verify-chunqiu.mjs`。

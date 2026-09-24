@@ -1,0 +1,24 @@
+/* A single legible UI face: no thin Song fallback in controls or information panels. */
+:root{--ui-font:"Microsoft YaHei UI","Microsoft YaHei","PingFang SC","Noto Sans CJK SC",system-ui,sans-serif}
+body,body *{font-family:var(--ui-font)!important}
+body{font-weight:500;font-synthesis:weight}button,select,input,summary{font-weight:600}button{letter-spacing:.04em}h2,h3,h4,strong,b{font-weight:700}
+.command-menu span{font-size:17px;font-weight:650;letter-spacing:2px}.command-menu button{min-height:46px}
+.panel-heading{font-size:14px;font-weight:650;letter-spacing:1px}.panel-heading em{font-weight:600;font-style:normal}
+.context-tabs button{font-size:14px;font-weight:650;letter-spacing:2px}.primary{font-size:16px;font-weight:700;letter-spacing:2px}
+.officer h2,.side-city-title h2{font-weight:700;letter-spacing:1px}.order h3{font-size:19px;font-weight:650;letter-spacing:.5px}.order p{font-weight:500;line-height:1.8}
+.tools button,.map-utilities button{font-size:12px;font-weight:600}.hero-portrait span{font-size:16px;font-weight:650;letter-spacing:2px}
+.turn-control .advance{font-size:20px;font-weight:700;letter-spacing:1px}.phase b{font-size:17px;font-weight:650;letter-spacing:2px}
+.era span{font-size:19px;font-weight:650}.stats b,.realm b,.side-city-stats dd,.ability-value,.ability-bars b{font-weight:650;font-variant-numeric:tabular-nums}
+#intelTabs button{font-size:16px;font-weight:650;letter-spacing:2px}.intel-header h2{font-size:25px;font-weight:700;letter-spacing:2px}.intel-lead{font-weight:650}
+.city-list b,.personal-orders b{font-size:18px;font-weight:650}.roster-toolbar strong{font-size:19px;font-weight:650;letter-spacing:1px}.officer-table tbody th button{font-size:15px;font-weight:650}.preview-identity h3{font-size:27px;font-weight:700;letter-spacing:2px}.officer-table thead th{font-weight:600}
+.city-label.map-object{font-size:16px;font-weight:650}.city-label.map-object>span{font-size:11px;font-weight:600;color:#fff0d8;text-shadow:0 1px 3px #171820,0 0 7px #171820}
+.city-label.map-object b,.strategic-view .city-label.map-object b{font-weight:650;display:block;padding:5px 11px 5px 15px;border:1px solid color-mix(in srgb,var(--faction-color) 75%,#fff);border-left:5px solid var(--faction-color);background:linear-gradient(110deg,#272630f5,#24252aeb);color:#fff0d8;border-radius:3px 9px 3px 9px;box-shadow:0 3px 9px #14162166;text-shadow:0 1px 2px #12141b}
+.strategic-view .city-label.map-object b{font-size:13px;padding:4px 8px 4px 10px;min-width:48px}.strategic-view .city-label.map-object b:before{color:var(--faction-color);font-size:9px;margin-right:5px}
+.city-label.map-object:hover b{background:#45414e;filter:brightness(1.2)}
+.realm-label,.realm-label.enemy{font-size:28px;font-weight:750;letter-spacing:5px;color:#fff3db;text-shadow:0 2px 3px #151923,0 0 12px #151923aa;border-bottom:3px solid var(--faction-color);padding:5px 10px;background:radial-gradient(ellipse,#1b20235c,transparent 75%)}.realm-label span{font-size:12px;font-weight:600;color:#fff0d0;letter-spacing:4px;margin-top:4px}
+.map-key{gap:13px;padding:9px 13px;border-radius:7px;background:#24232ee8;font-size:12px;font-weight:650;flex-wrap:wrap;max-width:calc(100vw - 30px)}.map-key i{width:10px;height:10px;border-radius:2px;border:1px solid #ffffff80;box-shadow:0 0 4px #0004}
+#cityFaction{color:var(--faction-color);font-weight:650}.faction-name .seal{border-color:var(--faction-color);background:color-mix(in srgb,var(--faction-color) 28%,#292731);color:#fff0d8;font-weight:700}.faction-cards .intel-card{border-top:3px solid var(--faction-color);border-radius:4px 12px 4px 12px}
+.city-list{max-height:460px;overflow:auto;scrollbar-width:thin}.city-dossier{align-self:start;position:sticky;top:0}
+@media(max-width:760px){.command-menu span{font-size:14px;letter-spacing:1px}.realm-label{font-size:22px}.map-key{gap:8px;font-size:10px;padding:7px 9px}.city-label.map-object b{font-size:14px}.faction-cards{grid-template-columns:1fr}}
+
+aside{max-height:calc(100vh - 168px)}.map-key{bottom:14px;z-index:5}

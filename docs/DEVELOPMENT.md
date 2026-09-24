@@ -103,3 +103,8 @@ Sites 的 `.openai/` 配置未进入 GitHub。新电脑若只 clone 仓库，应
 `officer-data.js` 扩充角色，`portrait-data.js` 与 assets/portraits 管理 30 张对应头像。驻城查询使用 `officersInCity`，动态武将按实时位置计算，不能又显示在老驻地。没有头像时保留姓名章。城市侧栏不要每 400 ms 无条件重建人物 DOM。
 
 `terrain-picking.js` 的 100 个分区共用原始顶点，不能加入 scene；未来变更地形顶点后需要同步包围盒。`performance-probe.js` 提供固定路线的 18 秒缩放测量；结果是本机观测。回归追加 `node verify-roster.mjs`、`node verify-terrain-picking.mjs`。后者较慢，因为同时测原始全网格作等价性和性能对照。
+
+
+## 春秋群英（2026-09-24）
+
+新增独立 `/chunqiu/` 剧本：28势力、38城、146人、10名活动AI、6708格。三国默认入口与系统保持不变。用户已确认跨时代同台；详见 [场景记录](CHUNQIU_SCENARIO.md)。验证：`node verify-chunqiu.mjs`。

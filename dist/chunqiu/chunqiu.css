@@ -1,0 +1,10 @@
+/* Separate scenario skin; the original Three Kingdoms page is untouched. */
+header{background:linear-gradient(110deg,#25211bef,#302921e9 82%,#342d2399)}
+.hero-portrait img,.officer-picture img,.dossier-portrait img,.dispatch-portrait,.army-face img{width:100%!important;height:100%!important;max-width:100%!important;left:0!important;top:0!important;transform:none!important;object-fit:contain}
+.dispatch-portrait{height:128px!important;width:98px!important;opacity:.8}
+.map-key{max-width:490px;display:grid;grid-template-columns:repeat(14,auto);gap:6px 10px;padding:9px 11px;opacity:.9}.map-key span{white-space:nowrap;font-size:10px}.map-key i{width:6px;height:6px}
+.realm-label{font-size:23px;letter-spacing:3px}.realm-label span{font-size:9px}
+.scenario-note{color:#cdb88a;font-size:12px}.chapter small{color:#d3bb83}.roster-toolbar strong{color:#e4ca93}
+.officer-face.monogram{background:linear-gradient(140deg,#504332,#25262a);border:1px solid #a68b5c66;color:#e0c793;font-family:"Microsoft YaHei",sans-serif}
+.officer-preview .officer-face.large.monogram{width:84px;height:99px;font-size:37px;border-radius:2px 15px 2px 2px}
+@media(max-width:900px){.map-key{grid-template-columns:repeat(7,auto);max-width:275px}}
