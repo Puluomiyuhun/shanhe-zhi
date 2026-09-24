@@ -28,3 +28,5 @@
 [三维样区验证](../三维样区验证记录.md)、[扩展战区验证](../扩展战区验证记录.md)、[五方势力与字体](../五方势力与字体调整记录.md)、[更新说明](../更新说明.md)属于历史阶段记录。规模、入口、操作发生过变化，以当前上下文与代码为准。
 
 素材出处见 [CREDITS](../dist/lab/assets/CREDITS.md)，Three.js 许可证见 [LICENSE](../dist/lab/vendor/LICENSE)。
+
+- [军令与情报界面改进（2026-09-24）](COMMAND_INTELLIGENCE_UI.md)
